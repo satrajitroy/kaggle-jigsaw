@@ -157,6 +157,10 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     optimizer = AdamW(model.parameters(), lr=1e-5)
     criterion = nn.CrossEntropyLoss()
 
+        # Training Loop for this fold
+    best_auc   = -1.0 # Track best AUC for this fold
+    best_model = None # To save the best model for this fold
+
     for epoch in range(4):
         model.train()
         total_loss = 0
@@ -195,7 +199,34 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 
             # Print metrics
             print(classification_report(labels_all, preds, digits=3))
-            print(f"AUC Score: {roc_auc_score(labels_all, preds_raw):.4f}")
+
+            curr_auc = roc_auc_score(labels_all, preds_raw)
+            print(f"AUC Score: {curr_auc:.4f}")
+
+            # Save the best model for this fold based on validation AUC
+            if curr_auc > best_auc:
+                best_auc = curr_auc
+                best_model = model.state_dict() # Save model weights
+                print(f"  -> New best Val AUC for Fold {fold+1}: {best_auc:.4f}")
+
+    # 6. Load best model state for this fold
+    model.load_state_dict(best_model_state)
+    print(f"Fold {fold+1} Best Val AUC: {best_val_auc:.4f}")
+
+    # 7. Make OOF predictions for this fold's validation set
+    # (This is for calculating overall CV score later)
+    model.eval()
+    fold_val_preds = []
+    with torch.no_grad():
+        for batch in val_loader:
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+            logits = outputs.logits
+            preds = torch.sigmoid(logits.squeeze(-1)).cpu().numpy()
+            fold_val_preds.extend(preds)
+
+    oof_preds[val_index] = fold_val_preds # Store OOF predictions
 
 
 # -----------------------------
@@ -254,4 +285,5 @@ submission = pd.DataFrame({
     "rule_violation": [p[1] for p in predictions]
 })
 submission.to_csv("submission.csv", index=False)
+
 print(submission.head(10))
