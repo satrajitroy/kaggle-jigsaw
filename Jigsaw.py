@@ -88,60 +88,38 @@ class MultiInputBERT(nn.Module):
         x = self.dropout(x)
         return self.classifier(x)
 
+class TestDataset(Dataset):
+    def __init__(self, df, tokenizer, max_len=128):
+        self.df = df
+        self.tokenizer = tokenizer
+        self.max_len = max_len
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        text_inputs = row["inputs"]
+        item = {}
+        for field in ["body", "rule", "pos", "neg"]:
+            encoded = self.tokenizer(
+                text_inputs[field],
+                truncation=True,
+                padding='max_length',
+                max_length=self.max_len,
+                return_tensors="pt"
+            )
+
+            for key in encoded:
+                item[f"{field}_{key}"] = encoded[key].squeeze(0)
+        return item
+
+
 # -----------------------------
 # Training and Evaluation
 # -----------------------------
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-
-# train_dataset = MultiInputDataset(train_df, tokenizer)
-# val_dataset = MultiInputDataset(val_df, tokenizer)
-# train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
-# val_loader = DataLoader(val_dataset, batch_size=8)
-#
-# model = MultiInputBERT().to(device)
-# optimizer = AdamW(model.parameters(), lr=1e-5)
-# criterion = nn.CrossEntropyLoss()
-#
-# for epoch in range(4):
-#     model.train()
-#     total_loss = 0
-#     for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
-#         inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
-#         labels = batch["label"].to(device)
-#
-#         optimizer.zero_grad()
-#         outputs = model(inputs)
-#         loss = criterion(outputs, labels)
-#         loss.backward()
-#         optimizer.step()
-#         total_loss += loss.item()
-#     print(f"Epoch {epoch+1} Loss: {total_loss / len(train_loader):.4f}")
-#
-#     # Eval
-#     model.eval()
-#     preds_raw, labels_all = [], []
-#     with torch.no_grad():
-#         for batch in val_loader:
-#             inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
-#             labels = batch["label"].to(device)
-#             outputs = model(inputs)
-#             try:
-#               logits = outputs.logits
-#             except AttributeError:
-#               # print("Falling back to raw tensor output (custom model)")
-#               logits = outputs
-#
-#             probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
-#             preds_raw += probs if isinstance(probs, list) else [probs]
-#             labels_all += labels.cpu().tolist()
-#
-#         # Hard labels (if you want classification metrics)
-#         preds = [int(p > 0.5) for p in preds_raw]
-#
-#         # Print metrics
-#         print(classification_report(labels_all, preds, digits=3))
-#         print(f"AUC Score: {roc_auc_score(labels_all, preds_raw):.4f}")
 
 for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
     print(f"\n----- Fold {fold+1} -----")
@@ -150,8 +128,12 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 
     train_dataset = MultiInputDataset(train_df, tokenizer)
     val_dataset = MultiInputDataset(val_df, tokenizer)
+    test_dataset = TestDataset(df_tst, tokenizer)
+
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=8)
+    test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+
 
     model = MultiInputBERT().to(device)
     optimizer = AdamW(model.parameters(), lr=1e-5)
@@ -213,7 +195,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     model.load_state_dict(best_model_state)
     print(f"Fold {fold+1} Best Val AUC: {best_val_auc:.4f}")
 
-    # 7. Make OOF predictions for this fold's validation set
+    # Make OOF predictions for this fold's validation set
     # (This is for calculating overall CV score later)
     model.eval()
     fold_val_preds = []
@@ -228,62 +210,31 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 
     oof_preds[val_index] = fold_val_preds # Store OOF predictions
 
-
-# -----------------------------
-# Testing and submission
-# -----------------------------
-df_tst["inputs"] = df_tst.apply(extract_texts, axis=1)
-
-
-class TestDataset(Dataset):
-    def __init__(self, df, tokenizer, max_len=128):
-        self.df = df
-        self.tokenizer = tokenizer
-        self.max_len = max_len
-
-    def __len__(self):
-        return len(self.df)
-
-    def __getitem__(self, idx):
-        row = self.df.iloc[idx]
-        text_inputs = row["inputs"]
-        item = {}
-        for field in ["body", "rule", "pos", "neg"]:
-            encoded = self.tokenizer(
-                text_inputs[field],
-                truncation=True,
-                padding='max_length',
-                max_length=self.max_len,
-                return_tensors="pt"
-            )
-
-            for key in encoded:
-                item[f"{field}_{key}"] = encoded[key].squeeze(0)
-        return item
-
-test_dataset = TestDataset(df_tst, tokenizer)
-test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
-
-model.eval()
-predictions = []
-
-with torch.no_grad():
-    for batch in test_loader:
-        batch = {k: v.to(device) for k, v in batch.items()}
-        outputs = model(batch)
-        try:
+    # Make predictions on the TEST set using this fold's best model
+    test_fold_preds = []
+    with torch.no_grad():
+        for batch in test_loader:
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
             logits = outputs.logits
-        except AttributeError:
-            # print("Falling back to raw tensor output (custom model)")
-            logits = outputs
+            preds = torch.sigmoid(logits.squeeze(-1)).cpu().numpy()
+            test_fold_preds.extend(preds)
 
-        probs = torch.sigmoid(logits.squeeze()).cpu().numpy()
-        predictions.extend(probs)
+    test_preds_folds.append(test_fold_preds) # Store test predictions from this fold
 
-submission = pd.DataFrame({
-    "row_id": df_tst["row_id"],
-    "rule_violation": [p[1] for p in predictions]
+
+overall_oof_auc = roc_auc_score(df_train['rule_violation'], oof_preds)
+print(f"\n--- Overall {N_SPLITS}-Fold OOF AUC: {overall_oof_auc:.4f} ---")
+
+# 10. Average test predictions across all folds
+final_test_predictions = np.mean(test_preds_folds, axis=0)
+
+# 11. Create final submission file
+submission_df = pd.DataFrame({
+    'row_id': df_test['row_id'],
+    'rule_violation': final_test_predictions
 })
-submission.to_csv("submission.csv", index=False)
-
-print(submission.head(10))
+submission_df.to_csv('submission.csv', index=False) # Save with a distinct name
+print("K-Fold submission.csv created successfully!")
+print(submission_df.head(10))
