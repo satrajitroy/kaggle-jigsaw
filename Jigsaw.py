@@ -15,6 +15,7 @@ from tqdm import tqdm
 trn = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/train.csv"
 tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn).dropna()
+df_trn = df_trn.sample(frac=0.05, random_state=42)
 
 df_tst = pd.read_csv(tst).dropna()
 
@@ -29,7 +30,7 @@ def extract_texts(row):
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 # train_df, val_df = train_test_split(df_trn, test_size=0.2, random_state=42, stratify=df_trn["rule_violation"])
 
-k_folds = 4
+k_folds = 3
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
 # -----------------------------
@@ -94,55 +95,6 @@ class MultiInputBERT(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-# train_dataset = MultiInputDataset(train_df, tokenizer)
-# val_dataset = MultiInputDataset(val_df, tokenizer)
-# train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
-# val_loader = DataLoader(val_dataset, batch_size=8)
-#
-# model = MultiInputBERT().to(device)
-# optimizer = AdamW(model.parameters(), lr=1e-5)
-# criterion = nn.CrossEntropyLoss()
-#
-# for epoch in range(4):
-#     model.train()
-#     total_loss = 0
-#     for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
-#         inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
-#         labels = batch["label"].to(device)
-#
-#         optimizer.zero_grad()
-#         outputs = model(inputs)
-#         loss = criterion(outputs, labels)
-#         loss.backward()
-#         optimizer.step()
-#         total_loss += loss.item()
-#     print(f"Epoch {epoch+1} Loss: {total_loss / len(train_loader):.4f}")
-#
-#     # Eval
-#     model.eval()
-#     preds_raw, labels_all = [], []
-#     with torch.no_grad():
-#         for batch in val_loader:
-#             inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
-#             labels = batch["label"].to(device)
-#             outputs = model(inputs)
-#             try:
-#               logits = outputs.logits
-#             except AttributeError:
-#               # print("Falling back to raw tensor output (custom model)")
-#               logits = outputs
-#
-#             probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
-#             preds_raw += probs if isinstance(probs, list) else [probs]
-#             labels_all += labels.cpu().tolist()
-#
-#         # Hard labels (if you want classification metrics)
-#         preds = [int(p > 0.5) for p in preds_raw]
-#
-#         # Print metrics
-#         print(classification_report(labels_all, preds, digits=3))
-#         print(f"AUC Score: {roc_auc_score(labels_all, preds_raw):.4f}")
-
 for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
     print(f"\n----- Fold {fold+1} -----")
     train_df = df_trn.iloc[train_idx].reset_index(drop=True)
@@ -157,7 +109,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     optimizer = AdamW(model.parameters(), lr=1e-5)
     criterion = nn.CrossEntropyLoss()
 
-    for epoch in range(4):
+    for epoch in range(3):
         model.train()
         total_loss = 0
         for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
