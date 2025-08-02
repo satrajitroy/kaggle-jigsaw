@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
+import torch_directml
 from torch.optim import AdamW
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
@@ -33,11 +34,10 @@ def get_device():
 
     # If no NVIDIA CUDA GPU, try to detect DirectML GPU
     try:
-        import torch_directml
         if torch_directml.is_available():
             device = torch_directml.device()
             print(f"Using DirectML GPU: {device}")
-            # Optional: Add a small test to ensure it's truly usable
+            # Add a small test to ensure it's truly usable
             try:
                 _ = torch.tensor([1], device=device)
             except Exception as e:
