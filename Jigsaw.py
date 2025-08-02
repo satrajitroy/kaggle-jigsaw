@@ -7,7 +7,7 @@ from sklearn.model_selection import StratifiedKFold
 from torch.optim import AdamW
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, BertModel # Keep BertModel forMultiInputBERT
+from transformers import AutoTokenizer, AutoModel
 
 # -----------------------------
 # Load and preprocess data
@@ -22,15 +22,15 @@ df_trn = pd.read_csv(trn)
 df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
 
+def getText(value):
+    return str(value) if pd.notna(value) else ''
 
 def extract_texts(row):
-    # *** FIX: Correctly include negative_example_2 ***
-    # *** Consider adding .fillna('') here if you don't dropna() on the whole df ***
     return {
-        "body": str(row["body"]), # Ensure string
-        "rule": str(row["rule"]), # Ensure string
-        "pos": f"{str(row['positive_example_1'].fillna(''))} {str(row['positive_example_2'].fillna(''))}",
-        "neg": f"{str(row['negative_example_1'].fillna(''))} {str(row['negative_example_2'].fillna(''))}",
+        "body": getText(row["body"]),
+        "rule": getText(row["rule"]),
+        "pos": f"{getText(row['positive_example_1'])} {getText(row['positive_example_2'])}",
+        "neg": f"{getText(row['negative_example_1'])} {getText(row['negative_example_2'])}",
     }
 
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
@@ -75,13 +75,10 @@ class MultiInputDataset(Dataset):
 # Model
 # -----------------------------
 class MultiInputBERT(nn.Module):
-    # *** FIX: Change model_name to xlm-roberta-base ***
     def __init__(self, model_name='xlm-roberta-base'):
         super().__init__()
-        # Use AutoModel for flexibility, or XLMRobertaModel if explicit
-        self.bert = BertModel.from_pretrained(model_name) # BertModel is fine for xlm-roberta-base
+        self.bert = AutoModel.from_pretrained(model_name)
         self.dropout = nn.Dropout(0.3)
-        # *** FIX: Change final layer output to 1 for BCEWithLogitsLoss ***
         self.classifier = nn.Sequential(
             nn.Linear(768 * 4, 256),
             nn.ReLU(),
@@ -104,10 +101,9 @@ class MultiInputBERT(nn.Module):
 # Training and Evaluation
 # -----------------------------
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# *** FIX: Use AutoTokenizer and xlm-roberta-base ***
 tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 
-# *** FIX: Initialize oof_preds as a NumPy array ***
+
 oof_preds = np.zeros(len(df_trn))
 test_preds_folds = [] # This is correct
 
@@ -129,14 +125,13 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 
     model = MultiInputBERT().to(device)
     optimizer = AdamW(model.parameters(), lr=1e-5)
-    # *** FIX: Change criterion to BCEWithLogitsLoss ***
     criterion = nn.BCEWithLogitsLoss()
 
     # Training Loop for this fold
     best_auc = -1.0 # Track best AUC for this fold
     best_model_state = None # To save the best model for this fold
 
-    for epoch in range(4): # Use 4 epochs as a starting point for this model
+    for epoch in range(2):
         model.train()
         total_loss = 0
         for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
@@ -145,8 +140,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 
             optimizer.zero_grad()
             outputs = model(inputs)
-            # *** FIX: Logits are already raw outputs from classifier ***
-            logits = outputs.squeeze(-1) # Squeeze to [batch_size] for BCEWithLogitsLoss
+            logits = outputs.squeeze(-1)
 
             loss = criterion(logits, labels)
             loss.backward()
@@ -162,13 +156,11 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
                 inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
                 labels = batch["label"].to(device)
                 outputs = model(inputs)
-                # *** FIX: Logits are already raw outputs from classifier ***
                 logits = outputs.squeeze(-1) # Squeeze to [batch_size]
 
-                # *** FIX: Use sigmoid for probabilities from BCEWithLogitsLoss ***
                 probs = torch.sigmoid(logits).detach().cpu().tolist()
-                preds_raw.extend(probs) # Use extend directly
-                labels_all.extend(labels.cpu().tolist()) # Use extend directly
+                preds_raw.extend(probs)
+                labels_all.extend(labels.cpu().tolist())
 
             # Hard labels (for classification report, optional)
             preds = [int(p > 0.5) for p in preds_raw]
@@ -206,7 +198,6 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
     print(f"Fold {fold+1} OOF AUC Check: {oof_fold_auc_check:.4f} (Must match Best Val AUC)")
 
-    # *** CRITICAL FIX: Assign predictions to the correct indices in the global oof_preds array ***
     oof_preds[val_idx] = np.array(fold_val_preds_list) # Use val_idx from kf.split
 
     # Make predictions on the TEST set using this fold's best model
@@ -228,10 +219,10 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 overall_oof_auc = roc_auc_score(df_trn['rule_violation'], oof_preds)
 print(f"\n--- Overall {k_folds}-Fold OOF AUC: {overall_oof_auc:.4f} ---")
 
-# 10. Average test predictions across all folds
+# Average test predictions across all folds
 final_test_predictions = np.mean(test_preds_folds, axis=0)
 
-# 11. Create final submission file
+# Create final submission file
 submission = pd.DataFrame({
     "row_id": df_tst["row_id"],
     "rule_violation": final_test_predictions
