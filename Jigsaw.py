@@ -7,7 +7,7 @@ from sklearn.model_selection import StratifiedKFold
 from torch.optim import AdamW
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, get_linear_schedule_with_warmup
 
 # -----------------------------
 # Load and preprocess data
@@ -36,7 +36,8 @@ def extract_texts(row):
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 df_tst["inputs"] = df_tst.apply(extract_texts, axis=1) # Apply to test data too
 
-k_folds = 5
+N_EPOCHS = 6
+k_folds  = 5
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
 # -----------------------------
@@ -141,7 +142,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     best_auc = -1.0 # Track best AUC for this fold
     best_model_state = None # To save the best model for this fold
 
-    for epoch in range(6):
+    for epoch in range(N_EPOCHS):
         model.train()
         total_loss = 0
         for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
