@@ -30,7 +30,7 @@ def extract_texts(row):
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 # train_df, val_df = train_test_split(df_trn, test_size=0.2, random_state=42, stratify=df_trn["rule_violation"])
 
-k_folds = 5
+k_folds = 3
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
 # -----------------------------
@@ -88,6 +88,7 @@ class MultiInputBERT(nn.Module):
         x = torch.cat(cls_outputs, dim=1)
         x = self.dropout(x)
         return self.classifier(x)
+
 
 class TestDataset(Dataset):
     def __init__(self, df, tokenizer, max_len=128):
@@ -206,6 +207,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     fold_val_preds_list = [] # List to collect predictions for this fold's validation set
     fold_val_true_list = []  # List to collect true labels for this fold's validation set (for sanity check)    preds_raw, labels_all = [], []
     fold_val_preds = []
+    preds_raw = []
     with torch.no_grad():
         for batch in tqdm(val_loader, desc=f"Validating Fold {fold+1}"):
             inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
@@ -218,7 +220,8 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
                 logits = outputs
 
             probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
-            fold_val_preds_list.extend(probs)
+            preds_raw += probs if isinstance(probs, list) else [probs]
+            fold_val_preds_list.extend(preds_raw)
             fold_val_true_list.extend(labels.cpu().numpy())
 
     # Sanity check: Calculate AUC for this fold's OOF predictions
@@ -227,16 +230,22 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     print(f"Fold {fold+1} OOF AUC Check: {oof_fold_auc_check:.4f} (Must match Best Val AUC)")
 
     # *** CRITICAL FIX: Assign predictions to the correct indices in the global oof_preds array ***
-    oof_preds[val_index] = np.array(fold_val_preds_list)
+    oof_preds[val_idx] = np.array(fold_val_preds_list)
 
     # Make predictions on the TEST set using this fold's best model
     test_fold_preds = []
     with torch.no_grad():
         for batch in tqdm(test_loader, desc=f"Testing Fold {fold+1}"):
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
+            inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
+            labels = batch["label"].to(device)
+            outputs = model(inputs)
+            try:
+                logits = outputs.logits
+            except AttributeError:
+                # print("Falling back to raw tensor output (custom model)")
+                logits = outputs
+
+            probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
             preds = torch.sigmoid(logits.squeeze(-1)).cpu().numpy()
             test_fold_preds.extend(preds)
 
