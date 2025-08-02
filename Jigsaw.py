@@ -23,6 +23,40 @@ df_trn = pd.read_csv(trn)
 df_tst = pd.read_csv(tst)
 
 
+def get_device():
+    # Try to detect NVIDIA CUDA GPU first
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print(f"Using NVIDIA CUDA GPU: {torch.cuda.get_device_name(0)}")
+        print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / (1024**3):.2f} GB")
+        return device
+
+    # If no NVIDIA CUDA GPU, try to detect DirectML GPU
+    try:
+        import torch_directml
+        if torch_directml.is_available():
+            device = torch_directml.device()
+            print(f"Using DirectML GPU: {device}")
+            # Optional: Add a small test to ensure it's truly usable
+            try:
+                _ = torch.tensor([1], device=device)
+            except Exception as e:
+                print(f"Warning: DirectML device found but not usable ({e}). Falling back to CPU.")
+                return torch.device("cpu")
+            return device
+        else:
+            print("DirectML is NOT available.")
+    except ImportError:
+        print("torch_directml not installed.")
+    except Exception as e:
+        print(f"Error checking DirectML: {e}. Falling back to CPU.")
+
+    # If neither GPU is found, fall back to CPU
+    device = torch.device("cpu")
+    print("No GPU (NVIDIA CUDA or DirectML) found. Using CPU.")
+    return device
+
+
 def fill_empty_examples_pandas(df):
     example_cols = ['positive_example_1', 'positive_example_2', 'negative_example_1', 'negative_example_2']
     for col in example_cols:
@@ -122,7 +156,7 @@ class MultiInputBERT(nn.Module):
 # -----------------------------
 # Training and Evaluation
 # -----------------------------
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = get_device()
 tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 
 
@@ -263,6 +297,7 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
 
 
 
