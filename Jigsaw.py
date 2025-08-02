@@ -203,7 +203,8 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     # Make OOF predictions for this fold's validation set
     # (This is for calculating overall CV score later)
     model.eval()
-    preds_raw, labels_all = [], []
+    fold_val_preds_list = [] # List to collect predictions for this fold's validation set
+    fold_val_true_list = []  # List to collect true labels for this fold's validation set (for sanity check)    preds_raw, labels_all = [], []
     fold_val_preds = []
     with torch.no_grad():
         for batch in tqdm(val_loader, desc=f"Validating Fold {fold+1}"):
@@ -217,11 +218,16 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
                 logits = outputs
 
             probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
-            preds_raw += probs if isinstance(probs, list) else [probs]
-            labels_all += labels.cpu().tolist()
-            fold_val_preds.extend(preds_raw)
+            fold_val_preds_list.extend(probs)
+            fold_val_true_list.extend(labels.cpu().numpy())
 
-    oof_preds.extend(fold_val_preds) # Store OOF predictions
+    # Sanity check: Calculate AUC for this fold's OOF predictions
+    # This should match the best_val_auc printed earlier for this fold
+    oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
+    print(f"Fold {fold+1} OOF AUC Check: {oof_fold_auc_check:.4f} (Must match Best Val AUC)")
+
+    # *** CRITICAL FIX: Assign predictions to the correct indices in the global oof_preds array ***
+    oof_preds[val_index] = np.array(fold_val_preds_list)
 
     # Make predictions on the TEST set using this fold's best model
     test_fold_preds = []
@@ -251,4 +257,5 @@ submission_df = pd.DataFrame({
 submission_df.to_csv('submission.csv', index=False) # Save with a distinct name
 print("K-Fold submission.csv created successfully!")
 print(submission_df.head(10))
+
 
