@@ -7,23 +7,21 @@ from sklearn.model_selection import StratifiedKFold
 from torch.optim import AdamW
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
-# Use AutoTokenizer for flexibility, and specify the model
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, BertModel # Keep BertModel for
-MultiInputBERT
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, BertModel # Keep BertModel forMultiInputBERT
 
 # -----------------------------
 # Load and preprocess data
 # -----------------------------
 # Use Kaggle paths when running on Kaggle
-trn = "/kaggle/input/jigsaw-agile-community-rules/train.csv"
-tst = "/kaggle/input/jigsaw-agile-community-rules/test.csv"
 
-# Load data. Avoid dropna() on the whole df if you plan to fillna('') for examples.
+# trn = "/kaggle/input/jigsaw-agile-community-rules/train.csv"
+# tst = "/kaggle/input/jigsaw-agile-community-rules/test.csv"
+trn = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/train.csv"
+tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn)
+df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
 
-# Sample for debugging (comment out for full run)
-# df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 
 def extract_texts(row):
     # *** FIX: Correctly include negative_example_2 ***
@@ -31,24 +29,25 @@ def extract_texts(row):
     return {
         "body": str(row["body"]), # Ensure string
         "rule": str(row["rule"]), # Ensure string
-        "pos": f"{str(row['positive_example_1']).fillna('')} {str(row['positive_example_2']).fillna('')}",
-        "neg": f"{str(row['negative_example_1']).fillna('')} {str(row['negative_example_2']).fillna('')}",
+        "pos": f"{str(row['positive_example_1'])} {str(row['positive_example_2'])}",
+        "neg": f"{str(row['negative_example_1'])} {str(row['negative_example_2'])}",
     }
 
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 df_tst["inputs"] = df_tst.apply(extract_texts, axis=1) # Apply to test data too
 
-k_folds = 5 # Changed to 5 for consistency with previous discussion
+k_folds = 3
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
 # -----------------------------
 # Dataset
 # -----------------------------
 class MultiInputDataset(Dataset):
-    def __init__(self, df, tokenizer, max_len=128): # Renamed df_trn to df for generality
+    def __init__(self, df, tokenizer, max_len=128, is_test=False): # Renamed df_trn to df for generality
         self.df = df
         self.tokenizer = tokenizer
         self.max_len = max_len
+        self.is_test = is_test
 
     def __len__(self):
         return len(self.df)
@@ -68,8 +67,8 @@ class MultiInputDataset(Dataset):
 
             for key in encoded:
                 item[f"{field}_{key}"] = encoded[key].squeeze(0)
-        # *** FIX: Label dtype to float32 for BCEWithLogitsLoss ***
-        item["label"] = torch.tensor(row["rule_violation"], dtype=torch.float32)
+        if not self.is_test:
+          item["label"] = torch.tensor(row["rule_violation"], dtype=torch.float32)
         return item
 
 # -----------------------------
@@ -112,6 +111,8 @@ tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 oof_preds = np.zeros(len(df_trn))
 test_preds_folds = [] # This is correct
 
+test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer), batch_size=16, shuffle=False)
+
 for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
     print(f"\n----- Fold {fold+1} -----")
     train_df = df_trn.iloc[train_idx].reset_index(drop=True)
@@ -119,13 +120,10 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 
     train_dataset = MultiInputDataset(train_df, tokenizer)
     val_dataset = MultiInputDataset(val_df, tokenizer)
-    # TestDataset is not needed as a separate class, MultiInputDataset can handle it
-    # test_dataset = TestDataset(df_tst, tokenizer) # REMOVE THIS LINE
 
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=8)
-    # Create test_loader outside the loop if you want to predict on full test set once
-    # Or create it here if you want to predict for each fold's model
+
     test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=16, shuffle=False)
 
 
@@ -238,6 +236,6 @@ submission = pd.DataFrame({
     "row_id": df_tst["row_id"],
     "rule_violation": final_test_predictions
 })
-submission.to_csv("submission_kfold_multi_input.csv", index=False) # Save with a distinct name
-print("K-Fold multi-input submission_kfold_multi_input.csv created successfully!")
+submission.to_csv("submission.csv", index=False) # Save with a distinct name
+print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
