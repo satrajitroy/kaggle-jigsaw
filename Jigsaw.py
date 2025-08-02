@@ -19,7 +19,7 @@ from transformers import AutoTokenizer, AutoModel, get_linear_schedule_with_warm
 trn = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/train.csv"
 tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn)
-#df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
+# df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
 
 
