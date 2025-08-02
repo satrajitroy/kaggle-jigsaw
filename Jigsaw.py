@@ -29,8 +29,8 @@ def extract_texts(row):
     return {
         "body": str(row["body"]), # Ensure string
         "rule": str(row["rule"]), # Ensure string
-        "pos": f"{str(row['positive_example_1'])} {str(row['positive_example_2'])}",
-        "neg": f"{str(row['negative_example_1'])} {str(row['negative_example_2'])}",
+        "pos": f"{str(row['positive_example_1'].fillna(''))} {str(row['positive_example_2'].fillna(''))}",
+        "neg": f"{str(row['negative_example_1'].fillna(''))} {str(row['negative_example_2'].fillna(''))}",
     }
 
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
@@ -239,3 +239,4 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
