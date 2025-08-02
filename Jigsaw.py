@@ -19,7 +19,7 @@ from transformers import AutoTokenizer, AutoModel
 trn = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/train.csv"
 tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn)
-df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
+#df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
 
 def getText(value):
@@ -36,7 +36,7 @@ def extract_texts(row):
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 df_tst["inputs"] = df_tst.apply(extract_texts, axis=1) # Apply to test data too
 
-k_folds = 3
+k_folds = 5
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
 # -----------------------------
@@ -131,7 +131,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     best_auc = -1.0 # Track best AUC for this fold
     best_model_state = None # To save the best model for this fold
 
-    for epoch in range(2):
+    for epoch in range(6):
         model.train()
         total_loss = 0
         for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
