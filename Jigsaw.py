@@ -121,6 +121,10 @@ class TestDataset(Dataset):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
+# Store predictions from each fold
+oof_preds = np.zeros(len(df_train))
+test_preds_folds = []
+
 for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
     print(f"\n----- Fold {fold+1} -----")
     train_df = df_trn.iloc[train_idx].reset_index(drop=True)
@@ -238,3 +242,4 @@ submission_df = pd.DataFrame({
 submission_df.to_csv('submission.csv', index=False) # Save with a distinct name
 print("K-Fold submission.csv created successfully!")
 print(submission_df.head(10))
+
