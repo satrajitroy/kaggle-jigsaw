@@ -1,13 +1,13 @@
+import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizer, BertModel
-from torch.optim import AdamW
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
+from torch.optim import AdamW
+from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+from transformers import BertTokenizer, BertModel
 
 # -----------------------------
 # Load and preprocess data
@@ -15,6 +15,7 @@ from tqdm import tqdm
 trn = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/train.csv"
 tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn).dropna()
+df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 
 df_tst = pd.read_csv(tst).dropna()
 
@@ -29,7 +30,7 @@ def extract_texts(row):
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 # train_df, val_df = train_test_split(df_trn, test_size=0.2, random_state=42, stratify=df_trn["rule_violation"])
 
-k_folds = 4
+k_folds = 5
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
 # -----------------------------
@@ -122,7 +123,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
 # Store predictions from each fold
-oof_preds = np.zeros(len(df_train))
+oof_preds = []
 test_preds_folds = []
 
 for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
@@ -147,7 +148,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     best_auc   = -1.0 # Track best AUC for this fold
     best_model = None # To save the best model for this fold
 
-    for epoch in range(4):
+    for epoch in range(3):
         model.train()
         total_loss = 0
         for batch in tqdm(train_loader, desc=f"Training Epoch {epoch+1}"):
@@ -166,7 +167,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
         model.eval()
         preds_raw, labels_all = [], []
         with torch.no_grad():
-            for batch in val_loader:
+            for batch in tqdm(val_loader, desc=f"Validating Epoch {epoch+1}"):
                 inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
                 labels = batch["label"].to(device)
                 outputs = model(inputs)
@@ -196,28 +197,36 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
                 print(f"  -> New best Val AUC for Fold {fold+1}: {best_auc:.4f}")
 
     # 6. Load best model state for this fold
-    model.load_state_dict(best_model_state)
-    print(f"Fold {fold+1} Best Val AUC: {best_val_auc:.4f}")
+    model.load_state_dict(best_model)
+    print(f"Fold {fold+1} Best Val AUC: {best_auc:.4f}")
 
     # Make OOF predictions for this fold's validation set
     # (This is for calculating overall CV score later)
     model.eval()
+    preds_raw, labels_all = [], []
     fold_val_preds = []
     with torch.no_grad():
-        for batch in val_loader:
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
-            preds = torch.sigmoid(logits.squeeze(-1)).cpu().numpy()
-            fold_val_preds.extend(preds)
+        for batch in tqdm(val_loader, desc=f"Validating Fold {fold+1}"):
+            inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
+            labels = batch["label"].to(device)
+            outputs = model(inputs)
+            try:
+                logits = outputs.logits
+            except AttributeError:
+                # print("Falling back to raw tensor output (custom model)")
+                logits = outputs
 
-    oof_preds[val_index] = fold_val_preds # Store OOF predictions
+            probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
+            preds_raw += probs if isinstance(probs, list) else [probs]
+            labels_all += labels.cpu().tolist()
+            fold_val_preds.extend(preds_raw)
+
+    oof_preds.extend(fold_val_preds) # Store OOF predictions
 
     # Make predictions on the TEST set using this fold's best model
     test_fold_preds = []
     with torch.no_grad():
-        for batch in test_loader:
+        for batch in tqdm(test_loader, desc=f"Testing Fold {fold+1}"):
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
@@ -228,15 +237,15 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     test_preds_folds.append(test_fold_preds) # Store test predictions from this fold
 
 
-overall_oof_auc = roc_auc_score(df_train['rule_violation'], oof_preds)
-print(f"\n--- Overall {N_SPLITS}-Fold OOF AUC: {overall_oof_auc:.4f} ---")
+overall_oof_auc = roc_auc_score(df_trn['rule_violation'], oof_preds)
+print(f"\n--- Overall {k_folds}-Fold OOF AUC: {overall_oof_auc:.4f} ---")
 
 # 10. Average test predictions across all folds
 final_test_predictions = np.mean(test_preds_folds, axis=0)
 
 # 11. Create final submission file
 submission_df = pd.DataFrame({
-    'row_id': df_test['row_id'],
+    'row_id': df_tst['row_id'],
     'rule_violation': final_test_predictions
 })
 submission_df.to_csv('submission.csv', index=False) # Save with a distinct name
