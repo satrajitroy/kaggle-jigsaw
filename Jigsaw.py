@@ -22,8 +22,24 @@ df_trn = pd.read_csv(trn)
 #df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
 
+
+def fill_empty_examples_pandas(df):
+    example_cols = ['positive_example_1', 'positive_example_2', 'negative_example_1', 'negative_example_2']
+    for col in example_cols:
+        df[col] = df[col].fillna('').astype(str)
+
+    df['positive_example_1'] = df['positive_example_1'].mask(df['positive_example_1'] == '', df['positive_example_2'])
+    df['positive_example_2'] = df['positive_example_2'].mask(df['positive_example_2'] == '', df['positive_example_1'])
+
+    df['negative_example_1'] = df['negative_example_1'].mask(df['negative_example_1'] == '', df['negative_example_2'])
+    df['negative_example_2'] = df['negative_example_2'].mask(df['negative_example_2'] == '', df['negative_example_1'])
+
+    return df
+
+
 def getText(value):
     return str(value) if pd.notna(value) else ''
+
 
 def extract_texts(row):
     return {
@@ -34,6 +50,9 @@ def extract_texts(row):
         "neg1": f"{getText(row['negative_example_1'])}",
         "neg2": f"{getText(row['negative_example_2'])}",
     }
+
+df_trn = fill_empty_examples_pandas(df_trn)
+df_tst = fill_empty_examples_pandas(df_tst)
 
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 df_tst["inputs"] = df_tst.apply(extract_texts, axis=1) # Apply to test data too
@@ -244,5 +263,6 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
 
 
