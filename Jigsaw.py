@@ -29,8 +29,10 @@ def extract_texts(row):
     return {
         "body": getText(row["body"]),
         "rule": getText(row["rule"]),
-        "pos": f"{getText(row['positive_example_1'])} {getText(row['positive_example_2'])}",
-        "neg": f"{getText(row['negative_example_1'])} {getText(row['negative_example_2'])}",
+        "pos1": f"{getText(row['positive_example_1'])}",
+        "pos2": f"{getText(row['positive_example_2'])}",
+        "neg1": f"{getText(row['negative_example_1'])}",
+        "neg2": f"{getText(row['negative_example_2'])}",
     }
 
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
@@ -57,7 +59,7 @@ class MultiInputDataset(Dataset):
         row = self.df.iloc[idx]
         text_inputs = row["inputs"]
         item = {}
-        for field in ["body", "rule", "pos", "neg"]:
+        for field in ["body", "rule", "pos1", "pos2", "neg1", "neg2"]:
             encoded = self.tokenizer(
                 text_inputs[field],
                 truncation=True,
@@ -81,14 +83,14 @@ class MultiInputBERT(nn.Module):
         self.bert = AutoModel.from_pretrained(model_name)
         self.dropout = nn.Dropout(0.3)
         self.classifier = nn.Sequential(
-            nn.Linear(768 * 4, 256),
+            nn.Linear(768 * 6, 256),
             nn.ReLU(),
             nn.Linear(256, 1) # Output a single logit
         )
 
     def forward(self, inputs):
         cls_outputs = []
-        for field in ["body", "rule", "pos", "neg"]:
+        for field in ["body", "rule", "pos1", "pos2", "neg1", "neg2"]:
             out = self.bert(
                 input_ids=inputs[f"{field}_input_ids"],
                 attention_mask=inputs[f"{field}_attention_mask"]
