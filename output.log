@@ -1,245 +1,466 @@
-Training Epoch 1:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 1: 100%|██████████| 191/191 [1:01:40<00:00, 19.38s/it]
-Epoch 1 Loss: 0.6768
+----- Fold 1 -----
+2025-08-02 11:18:11.058915: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1754133491.080860      95 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1754133491.087483      95 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Training Epoch 1: 100%|██████████| 203/203 [01:40<00:00,  2.03it/s]
+Epoch 1 Loss: 0.6874
+Validating Epoch 1: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
               precision    recall  f1-score   support
 
-           0      0.635     0.792     0.705       250
-           1      0.735     0.558     0.634       258
+         0.0      0.769     0.050     0.094       200
+         1.0      0.517     0.985     0.678       206
 
-    accuracy                          0.673       508
-   macro avg      0.685     0.675     0.669       508
-weighted avg      0.685     0.673     0.669       508
+    accuracy                          0.525       406
+   macro avg      0.643     0.518     0.386       406
+weighted avg      0.641     0.525     0.390       406
 
-AUC Score: 0.7710
-Training Epoch 2:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 2: 100%|██████████| 191/191 [1:01:53<00:00, 19.44s/it]
-Epoch 2 Loss: 0.5600
+AUC Score: 0.5428
+  -> New best Val AUC for Fold 1: 0.5428
+Training Epoch 2: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 2 Loss: 0.6324
+Validating Epoch 2: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
               precision    recall  f1-score   support
 
-           0      0.857     0.720     0.783       250
-           1      0.765     0.884     0.820       258
+         0.0      0.938     0.375     0.536       200
+         1.0      0.617     0.976     0.756       206
 
-    accuracy                          0.803       508
-   macro avg      0.811     0.802     0.801       508
-weighted avg      0.810     0.803     0.802       508
+    accuracy                          0.680       406
+   macro avg      0.777     0.675     0.646       406
+weighted avg      0.775     0.680     0.647       406
 
-AUC Score: 0.8610
-Training Epoch 3:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 3: 100%|██████████| 191/191 [1:03:34<00:00, 19.97s/it]
-Epoch 3 Loss: 0.3768
+AUC Score: 0.8108
+  -> New best Val AUC for Fold 1: 0.8108
+Training Epoch 3: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 3 Loss: 0.5168
+Validating Epoch 3: 100%|██████████| 51/51 [00:06<00:00,  7.51it/s]
               precision    recall  f1-score   support
 
-           0      0.774     0.848     0.809       250
-           1      0.838     0.760     0.797       258
+         0.0      0.917     0.610     0.733       200
+         1.0      0.714     0.947     0.814       206
 
-    accuracy                          0.803       508
-   macro avg      0.806     0.804     0.803       508
-weighted avg      0.806     0.803     0.803       508
+    accuracy                          0.781       406
+   macro avg      0.816     0.778     0.773       406
+weighted avg      0.814     0.781     0.774       406
 
-AUC Score: 0.8657
-Training Epoch 4:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 4: 100%|██████████| 191/191 [1:03:32<00:00, 19.96s/it]
-Epoch 4 Loss: 0.2096
+AUC Score: 0.8418
+  -> New best Val AUC for Fold 1: 0.8418
+Training Epoch 4: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 4 Loss: 0.4383
+Validating Epoch 4: 100%|██████████| 51/51 [00:06<00:00,  7.52it/s]
               precision    recall  f1-score   support
 
-           0      0.818     0.684     0.745       250
-           1      0.736     0.853     0.790       258
+         0.0      0.825     0.755     0.789       200
+         1.0      0.780     0.845     0.811       206
 
-    accuracy                          0.770       508
-   macro avg      0.777     0.768     0.768       508
-weighted avg      0.776     0.770     0.768       508
+    accuracy                          0.800       406
+   macro avg      0.803     0.800     0.800       406
+weighted avg      0.802     0.800     0.800       406
 
-AUC Score: 0.8542
+AUC Score: 0.8590
+  -> New best Val AUC for Fold 1: 0.8590
+Training Epoch 5: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 5 Loss: 0.3543
+Validating Epoch 5: 100%|██████████| 51/51 [00:06<00:00,  7.51it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.897     0.650     0.754       200
+         1.0      0.732     0.927     0.818       206
+
+    accuracy                          0.791       406
+   macro avg      0.814     0.789     0.786       406
+weighted avg      0.813     0.791     0.786       406
+
+AUC Score: 0.8558
+Training Epoch 6: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 6 Loss: 0.2750
+Validating Epoch 6: 100%|██████████| 51/51 [00:06<00:00,  7.53it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.800     0.760     0.779       200
+         1.0      0.778     0.816     0.796       206
+
+    accuracy                          0.788       406
+   macro avg      0.789     0.788     0.788       406
+weighted avg      0.789     0.788     0.788       406
+
+AUC Score: 0.8559
+Fold 1 Best Val AUC: 0.8590
+Fold 1 OOF Prediction: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
+Fold 1 OOF AUC Check: 0.8559 (Must match Best Val AUC)
+Fold 1 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  6.06it/s]
 
 ----- Fold 2 -----
-Training Epoch 1:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 1: 100%|██████████| 191/191 [1:03:07<00:00, 19.83s/it]
-Epoch 1 Loss: 0.6706
+Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Training Epoch 1: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 1 Loss: 0.6833
+Validating Epoch 1: 100%|██████████| 51/51 [00:06<00:00,  7.55it/s]
               precision    recall  f1-score   support
 
-           0      0.792     0.380     0.514       250
-           1      0.599     0.903     0.720       257
+         0.0      0.612     0.505     0.553       200
+         1.0      0.589     0.689     0.635       206
 
-    accuracy                          0.645       507
-   macro avg      0.696     0.641     0.617       507
-weighted avg      0.694     0.645     0.618       507
+    accuracy                          0.599       406
+   macro avg      0.601     0.597     0.594       406
+weighted avg      0.600     0.599     0.595       406
 
-AUC Score: 0.6816
-Training Epoch 2:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 2: 100%|██████████| 191/191 [1:03:05<00:00, 19.82s/it]
-Epoch 2 Loss: 0.5511
+AUC Score: 0.7007
+  -> New best Val AUC for Fold 2: 0.7007
+Training Epoch 2: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 2 Loss: 0.5634
+Validating Epoch 2: 100%|██████████| 51/51 [00:06<00:00,  7.52it/s]
               precision    recall  f1-score   support
 
-           0      0.789     0.688     0.735       250
-           1      0.730     0.821     0.773       257
+         0.0      0.800     0.680     0.735       200
+         1.0      0.729     0.835     0.778       206
 
-    accuracy                          0.755       507
-   macro avg      0.760     0.755     0.754       507
-weighted avg      0.759     0.755     0.754       507
+    accuracy                          0.759       406
+   macro avg      0.764     0.757     0.757       406
+weighted avg      0.764     0.759     0.757       406
 
-AUC Score: 0.8292
-Training Epoch 3:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 3: 100%|██████████| 191/191 [1:03:25<00:00, 19.92s/it]
-Epoch 3 Loss: 0.3723
+AUC Score: 0.7919
+  -> New best Val AUC for Fold 2: 0.7919
+Training Epoch 3: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 3 Loss: 0.4721
+Validating Epoch 3: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
               precision    recall  f1-score   support
 
-           0      0.813     0.660     0.728       250
-           1      0.720     0.852     0.781       257
+         0.0      0.854     0.700     0.769       200
+         1.0      0.752     0.883     0.813       206
 
-    accuracy                          0.757       507
-   macro avg      0.767     0.756     0.755       507
-weighted avg      0.766     0.757     0.755       507
+    accuracy                          0.793       406
+   macro avg      0.803     0.792     0.791       406
+weighted avg      0.802     0.793     0.791       406
 
-AUC Score: 0.8487
-Training Epoch 4:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 4: 100%|██████████| 191/191 [1:03:05<00:00, 19.82s/it]
-Epoch 4 Loss: 0.2057
+AUC Score: 0.8296
+  -> New best Val AUC for Fold 2: 0.8296
+Training Epoch 4: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 4 Loss: 0.3680
+Validating Epoch 4: 100%|██████████| 51/51 [00:06<00:00,  7.53it/s]
               precision    recall  f1-score   support
 
-           0      0.804     0.720     0.759       250
-           1      0.753     0.829     0.789       257
+         0.0      0.838     0.750     0.792       200
+         1.0      0.780     0.859     0.818       206
 
-    accuracy                          0.775       507
-   macro avg      0.778     0.774     0.774       507
-weighted avg      0.778     0.775     0.774       507
+    accuracy                          0.805       406
+   macro avg      0.809     0.805     0.805       406
+weighted avg      0.808     0.805     0.805       406
 
-AUC Score: 0.8433
+AUC Score: 0.8582
+  -> New best Val AUC for Fold 2: 0.8582
+Training Epoch 5: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 5 Loss: 0.3071
+Validating Epoch 5: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.787     0.775     0.781       200
+         1.0      0.785     0.796     0.790       206
+
+    accuracy                          0.786       406
+   macro avg      0.786     0.786     0.786       406
+weighted avg      0.786     0.786     0.786       406
+
+AUC Score: 0.8709
+  -> New best Val AUC for Fold 2: 0.8709
+Training Epoch 6: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 6 Loss: 0.2446
+Validating Epoch 6: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.839     0.705     0.766       200
+         1.0      0.752     0.869     0.806       206
+
+    accuracy                          0.788       406
+   macro avg      0.796     0.787     0.786       406
+weighted avg      0.795     0.788     0.787       406
+
+AUC Score: 0.8634
+Fold 2 Best Val AUC: 0.8709
+Fold 2 OOF Prediction: 100%|██████████| 51/51 [00:06<00:00,  7.55it/s]
+Fold 2 OOF AUC Check: 0.8634 (Must match Best Val AUC)
+Fold 2 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  6.07it/s]
 
 ----- Fold 3 -----
-Training Epoch 1:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 1: 100%|██████████| 191/191 [1:06:15<00:00, 20.82s/it]
-Epoch 1 Loss: 0.6564
+Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Training Epoch 1: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 1 Loss: 0.6769
+Validating Epoch 1: 100%|██████████| 51/51 [00:06<00:00,  7.53it/s]
               precision    recall  f1-score   support
 
-           0      0.635     0.928     0.754       249
-           1      0.874     0.484     0.623       258
+         0.0      0.807     0.335     0.473       200
+         1.0      0.588     0.922     0.718       206
 
-    accuracy                          0.702       507
-   macro avg      0.754     0.706     0.689       507
-weighted avg      0.756     0.702     0.687       507
+    accuracy                          0.633       406
+   macro avg      0.698     0.629     0.596       406
+weighted avg      0.696     0.633     0.598       406
 
-AUC Score: 0.8389
-Training Epoch 2:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 2: 100%|██████████| 191/191 [1:06:07<00:00, 20.77s/it]
-Epoch 2 Loss: 0.4879
+AUC Score: 0.6514
+  -> New best Val AUC for Fold 3: 0.6514
+Training Epoch 2: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 2 Loss: 0.6227
+Validating Epoch 2: 100%|██████████| 51/51 [00:06<00:00,  7.52it/s]
               precision    recall  f1-score   support
 
-           0      0.731     0.851     0.787       249
-           1      0.829     0.698     0.758       258
+         0.0      0.798     0.750     0.773       200
+         1.0      0.771     0.816     0.792       206
 
-    accuracy                          0.773       507
-   macro avg      0.780     0.775     0.772       507
-weighted avg      0.781     0.773     0.772       507
+    accuracy                          0.783       406
+   macro avg      0.784     0.783     0.783       406
+weighted avg      0.784     0.783     0.783       406
 
-AUC Score: 0.8619
-Training Epoch 3:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 3: 100%|██████████| 191/191 [1:06:33<00:00, 20.91s/it]
-Epoch 3 Loss: 0.3115
+AUC Score: 0.8292
+  -> New best Val AUC for Fold 3: 0.8292
+Training Epoch 3: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 3 Loss: 0.5114
+Validating Epoch 3: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
               precision    recall  f1-score   support
 
-           0      0.784     0.771     0.777       249
-           1      0.782     0.795     0.788       258
+         0.0      0.831     0.760     0.794       200
+         1.0      0.785     0.850     0.816       206
 
-    accuracy                          0.783       507
-   macro avg      0.783     0.783     0.783       507
-weighted avg      0.783     0.783     0.783       507
+    accuracy                          0.805       406
+   macro avg      0.808     0.805     0.805       406
+weighted avg      0.807     0.805     0.805       406
 
-AUC Score: 0.8614
-Training Epoch 4:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 4: 100%|██████████| 191/191 [1:06:46<00:00, 20.98s/it]
-Epoch 4 Loss: 0.1849
+AUC Score: 0.8781
+  -> New best Val AUC for Fold 3: 0.8781
+Training Epoch 4: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 4 Loss: 0.4143
+Validating Epoch 4: 100%|██████████| 51/51 [00:06<00:00,  7.54it/s]
               precision    recall  f1-score   support
 
-           0      0.779     0.695     0.735       249
-           1      0.733     0.810     0.770       258
+         0.0      0.821     0.690     0.750       200
+         1.0      0.739     0.854     0.793       206
 
-    accuracy                          0.753       507
-   macro avg      0.756     0.752     0.752       507
-weighted avg      0.756     0.753     0.753       507
+    accuracy                          0.773       406
+   macro avg      0.780     0.772     0.771       406
+weighted avg      0.780     0.773     0.772       406
 
-AUC Score: 0.8473
+AUC Score: 0.8604
+Training Epoch 5: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 5 Loss: 0.3458
+Validating Epoch 5: 100%|██████████| 51/51 [00:06<00:00,  7.57it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.848     0.640     0.729       200
+         1.0      0.718     0.888     0.794       206
+
+    accuracy                          0.766       406
+   macro avg      0.783     0.764     0.762       406
+weighted avg      0.782     0.766     0.762       406
+
+AUC Score: 0.8536
+Training Epoch 6: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 6 Loss: 0.2836
+Validating Epoch 6: 100%|██████████| 51/51 [00:06<00:00,  7.56it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.767     0.740     0.753       200
+         1.0      0.756     0.782     0.768       206
+
+    accuracy                          0.761       406
+   macro avg      0.761     0.761     0.761       406
+weighted avg      0.761     0.761     0.761       406
+
+AUC Score: 0.8594
+Fold 3 Best Val AUC: 0.8781
+Fold 3 OOF Prediction: 100%|██████████| 51/51 [00:06<00:00,  7.55it/s]
+Fold 3 OOF AUC Check: 0.8594 (Must match Best Val AUC)
+Fold 3 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  6.08it/s]
 
 ----- Fold 4 -----
-Training Epoch 1:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 1: 100%|██████████| 191/191 [1:06:24<00:00, 20.86s/it]
-Epoch 1 Loss: 0.6745
+Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Training Epoch 1: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 1 Loss: 0.6839
+Validating Epoch 1: 100%|██████████| 51/51 [00:06<00:00,  7.56it/s]
               precision    recall  f1-score   support
 
-           0      0.572     0.590     0.581       249
-           1      0.592     0.574     0.583       258
+         0.0      0.662     0.658     0.660       199
+         1.0      0.673     0.676     0.675       207
 
-    accuracy                          0.582       507
-   macro avg      0.582     0.582     0.582       507
-weighted avg      0.582     0.582     0.582       507
+    accuracy                          0.667       406
+   macro avg      0.667     0.667     0.667       406
+weighted avg      0.667     0.667     0.667       406
 
-AUC Score: 0.7019
-Training Epoch 2:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 2: 100%|██████████| 191/191 [1:06:17<00:00, 20.82s/it]
-Epoch 2 Loss: 0.5243
+AUC Score: 0.7522
+  -> New best Val AUC for Fold 4: 0.7522
+Training Epoch 2: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 2 Loss: 0.5868
+Validating Epoch 2: 100%|██████████| 51/51 [00:06<00:00,  7.56it/s]
               precision    recall  f1-score   support
 
-           0      0.832     0.598     0.696       249
-           1      0.695     0.884     0.778       258
+         0.0      0.846     0.663     0.744       199
+         1.0      0.732     0.884     0.801       207
 
-    accuracy                          0.744       507
-   macro avg      0.764     0.741     0.737       507
-weighted avg      0.763     0.744     0.738       507
+    accuracy                          0.776       406
+   macro avg      0.789     0.774     0.772       406
+weighted avg      0.788     0.776     0.773       406
 
-AUC Score: 0.8417
-Training Epoch 3:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 3: 100%|██████████| 191/191 [1:06:24<00:00, 20.86s/it]
-Epoch 3 Loss: 0.3512
+AUC Score: 0.8666
+  -> New best Val AUC for Fold 4: 0.8666
+Training Epoch 3: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 3 Loss: 0.4577
+Validating Epoch 3: 100%|██████████| 51/51 [00:06<00:00,  7.56it/s]
               precision    recall  f1-score   support
 
-           0      0.782     0.763     0.772       249
-           1      0.777     0.795     0.785       258
+         0.0      0.850     0.683     0.758       199
+         1.0      0.744     0.884     0.808       207
 
-    accuracy                          0.779       507
-   macro avg      0.779     0.779     0.779       507
-weighted avg      0.779     0.779     0.779       507
+    accuracy                          0.786       406
+   macro avg      0.797     0.784     0.783       406
+weighted avg      0.796     0.786     0.783       406
 
-AUC Score: 0.8506
-Training Epoch 4:   0%|          | 0/191 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
-Training Epoch 4: 100%|██████████| 191/191 [1:08:09<00:00, 21.41s/it]
-Epoch 4 Loss: 0.2103
+AUC Score: 0.8686
+  -> New best Val AUC for Fold 4: 0.8686
+Training Epoch 4: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 4 Loss: 0.3608
+Validating Epoch 4: 100%|██████████| 51/51 [00:06<00:00,  7.50it/s]
               precision    recall  f1-score   support
 
-           0      0.789     0.735     0.761       249
-           1      0.760     0.810     0.784       258
+         0.0      0.864     0.543     0.667       199
+         1.0      0.676     0.918     0.779       207
 
-    accuracy                          0.773       507
-   macro avg      0.774     0.773     0.773       507
-weighted avg      0.774     0.773     0.773       507
+    accuracy                          0.734       406
+   macro avg      0.770     0.730     0.723       406
+weighted avg      0.768     0.734     0.724       406
 
-AUC Score: 0.8465
-C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1762: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
-  return forward_call(*args, **kwargs)
+AUC Score: 0.8309
+Training Epoch 5: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 5 Loss: 0.3017
+Validating Epoch 5: 100%|██████████| 51/51 [00:06<00:00,  7.51it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.836     0.638     0.724       199
+         1.0      0.717     0.879     0.790       207
+
+    accuracy                          0.761       406
+   macro avg      0.776     0.759     0.757       406
+weighted avg      0.775     0.761     0.757       406
+
+AUC Score: 0.8606
+Training Epoch 6: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 6 Loss: 0.2614
+Validating Epoch 6: 100%|██████████| 51/51 [00:06<00:00,  7.56it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.849     0.593     0.698       199
+         1.0      0.697     0.899     0.785       207
+
+    accuracy                          0.749       406
+   macro avg      0.773     0.746     0.742       406
+weighted avg      0.771     0.749     0.742       406
+
+AUC Score: 0.8423
+Fold 4 Best Val AUC: 0.8686
+Fold 4 OOF Prediction: 100%|██████████| 51/51 [00:06<00:00,  7.56it/s]
+Fold 4 OOF AUC Check: 0.8423 (Must match Best Val AUC)
+Fold 4 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  6.08it/s]
+
+----- Fold 5 -----
+Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Training Epoch 1: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 1 Loss: 0.6881
+Validating Epoch 1: 100%|██████████| 51/51 [00:06<00:00,  7.55it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.912     0.312     0.464       199
+         1.0      0.593     0.971     0.737       206
+
+    accuracy                          0.647       405
+   macro avg      0.753     0.641     0.601       405
+weighted avg      0.750     0.647     0.603       405
+
+AUC Score: 0.6998
+  -> New best Val AUC for Fold 5: 0.6998
+Training Epoch 2: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 2 Loss: 0.6019
+Validating Epoch 2: 100%|██████████| 51/51 [00:06<00:00,  7.57it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.757     0.704     0.729       199
+         1.0      0.732     0.782     0.756       206
+
+    accuracy                          0.743       405
+   macro avg      0.744     0.743     0.743       405
+weighted avg      0.744     0.743     0.743       405
+
+AUC Score: 0.7893
+  -> New best Val AUC for Fold 5: 0.7893
+Training Epoch 3: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 3 Loss: 0.5026
+Validating Epoch 3: 100%|██████████| 51/51 [00:06<00:00,  7.57it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.787     0.724     0.754       199
+         1.0      0.752     0.811     0.780       206
+
+    accuracy                          0.768       405
+   macro avg      0.770     0.767     0.767       405
+weighted avg      0.769     0.768     0.767       405
+
+AUC Score: 0.8491
+  -> New best Val AUC for Fold 5: 0.8491
+Training Epoch 4: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 4 Loss: 0.4303
+Validating Epoch 4: 100%|██████████| 51/51 [00:06<00:00,  7.57it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.826     0.668     0.739       199
+         1.0      0.730     0.864     0.791       206
+
+    accuracy                          0.768       405
+   macro avg      0.778     0.766     0.765       405
+weighted avg      0.777     0.768     0.765       405
+
+AUC Score: 0.8433
+Training Epoch 5: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 5 Loss: 0.3566
+Validating Epoch 5: 100%|██████████| 51/51 [00:06<00:00,  7.57it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.810     0.643     0.717       199
+         1.0      0.713     0.854     0.777       206
+
+    accuracy                          0.751       405
+   macro avg      0.761     0.749     0.747       405
+weighted avg      0.760     0.751     0.748       405
+
+AUC Score: 0.8635
+  -> New best Val AUC for Fold 5: 0.8635
+Training Epoch 6: 100%|██████████| 203/203 [01:39<00:00,  2.04it/s]
+Epoch 6 Loss: 0.3111
+Validating Epoch 6: 100%|██████████| 51/51 [00:06<00:00,  7.58it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.799     0.719     0.757       199
+         1.0      0.752     0.825     0.787       206
+
+    accuracy                          0.773       405
+   macro avg      0.776     0.772     0.772       405
+weighted avg      0.775     0.773     0.772       405
+
+AUC Score: 0.8628
+Fold 5 Best Val AUC: 0.8635
+Fold 5 OOF Prediction: 100%|██████████| 51/51 [00:06<00:00,  7.57it/s]
+Fold 5 OOF AUC Check: 0.8628 (Must match Best Val AUC)
+Fold 5 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  6.09it/s]
+
+--- Overall 5-Fold OOF AUC: 0.8523 ---
+K-Fold multi-input submission.csv created successfully!
    row_id  rule_violation
-0    2029        0.158793
-1    2030        0.803769
-2    2031        0.260937
-3    2032        0.847930
-4    2033        0.886439
-5    2034        0.095888
-6    2035        0.863526
-7    2036        0.111181
-8    2037        0.087672
-9    2038        0.860655
-
-Process finished with exit code 0
+0    2029        0.032626
+1    2030        0.618280
+2    2031        0.918273
+3    2032        0.980104
+4    2033        0.969868
+5    2034        0.018413
+6    2035        0.966329
+7    2036        0.020938
+8    2037        0.019040
+9    2038        0.955069
