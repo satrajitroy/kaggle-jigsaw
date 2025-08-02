@@ -127,6 +127,16 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     optimizer = AdamW(model.parameters(), lr=1e-5)
     criterion = nn.BCEWithLogitsLoss()
 
+    num_training_steps_per_fold = len(train_loader) * N_EPOCHS
+    num_warmup_steps_per_fold = int(num_training_steps_per_fold * 0.05)
+    
+    # Initialize the scheduler
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer,
+        num_warmup_steps=num_warmup_steps_per_fold,
+        num_training_steps=num_training_steps_per_fold
+    )
+
     # Training Loop for this fold
     best_auc = -1.0 # Track best AUC for this fold
     best_model_state = None # To save the best model for this fold
@@ -145,6 +155,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
             loss = criterion(logits, labels)
             loss.backward()
             optimizer.step()
+            scheduler.step()
             total_loss += loss.item()
         print(f"Epoch {epoch+1} Loss: {total_loss / len(train_loader):.4f}")
 
@@ -230,4 +241,5 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
 
