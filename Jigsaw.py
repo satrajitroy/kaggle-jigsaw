@@ -33,23 +33,23 @@ def get_device():
         return device
 
     # If no NVIDIA CUDA GPU, try to detect DirectML GPU
-    try:
-        if torch_directml.is_available():
-            device = torch_directml.device()
-            print(f"Using DirectML GPU: {device}")
-            # Add a small test to ensure it's truly usable
-            try:
-                _ = torch.tensor([1], device=device)
-            except Exception as e:
-                print(f"Warning: DirectML device found but not usable ({e}). Falling back to CPU.")
-                return torch.device("cpu")
-            return device
-        else:
-            print("DirectML is NOT available.")
-    except ImportError:
-        print("torch_directml not installed.")
-    except Exception as e:
-        print(f"Error checking DirectML: {e}. Falling back to CPU.")
+    # try:
+    #     if torch_directml.is_available():
+    #         device = torch_directml.device()
+    #         print(f"Using DirectML GPU: {device}")
+    #         # Add a small test to ensure it's truly usable
+    #         try:
+    #             _ = torch.tensor([1], device=device)
+    #         except Exception as e:
+    #             print(f"Warning: DirectML device found but not usable ({e}). Falling back to CPU.")
+    #             return torch.device("cpu")
+    #         return device
+    #     else:
+    #         print("DirectML is NOT available.")
+    # except ImportError:
+    #     print("torch_directml not installed.")
+    # except Exception as e:
+    #     print(f"Error checking DirectML: {e}. Falling back to CPU.")
 
     # If neither GPU is found, fall back to CPU
     device = torch.device("cpu")
@@ -79,6 +79,7 @@ def extract_texts(row):
     return {
         "body": getText(row["body"]),
         "rule": getText(row["rule"]),
+        "subreddit": getText(row["subreddit"]),
         "pos1": f"{getText(row['positive_example_1'])}",
         "pos2": f"{getText(row['positive_example_2'])}",
         "neg1": f"{getText(row['negative_example_1'])}",
@@ -112,7 +113,7 @@ class MultiInputDataset(Dataset):
         row = self.df.iloc[idx]
         text_inputs = row["inputs"]
         item = {}
-        for field in ["body", "rule", "pos1", "pos2", "neg1", "neg2"]:
+        for field in ["body", "rule", "subreddit", "pos1", "pos2", "neg1", "neg2"]:
             encoded = self.tokenizer(
                 text_inputs[field],
                 truncation=True,
@@ -136,14 +137,14 @@ class MultiInputBERT(nn.Module):
         self.bert = AutoModel.from_pretrained(model_name)
         self.dropout = nn.Dropout(0.3)
         self.classifier = nn.Sequential(
-            nn.Linear(768 * 6, 256),
+            nn.Linear(768 * 7, 256),
             nn.ReLU(),
             nn.Linear(256, 1) # Output a single logit
         )
 
     def forward(self, inputs):
         cls_outputs = []
-        for field in ["body", "rule", "pos1", "pos2", "neg1", "neg2"]:
+        for field in ["body", "rule", "subreddit", "pos1", "pos2", "neg1", "neg2"]:
             out = self.bert(
                 input_ids=inputs[f"{field}_input_ids"],
                 attention_mask=inputs[f"{field}_attention_mask"]
