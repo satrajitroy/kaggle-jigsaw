@@ -1,0 +1,263 @@
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.model_selection import StratifiedKFold
+from torch.optim import AdamW
+from torch.utils.data import Dataset, DataLoader
+from tqdm import tqdm
+from transformers import AutoTokenizer, AutoModel, get_linear_schedule_with_warmup
+
+# -----------------------------
+# Load and preprocess data
+# -----------------------------
+# Use Kaggle paths when running on Kaggle
+MODEL_PATH = "/kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline"
+
+trn = "/kaggle/input/jigsaw-agile-community-rules/train.csv"
+tst = "/kaggle/input/jigsaw-agile-community-rules/test.csv"
+df_trn = pd.read_csv(trn)
+df_tst = pd.read_csv(tst)
+
+
+def fill_empty_examples_pandas(df):
+  example_cols = ['positive_example_1', 'positive_example_2', 'negative_example_1', 'negative_example_2']
+  for col in example_cols:
+    df[col] = df[col].fillna('').astype(str)
+
+  df['positive_example_1'] = df['positive_example_1'].mask(df['positive_example_1'] == '', df['positive_example_2'])
+  df['positive_example_2'] = df['positive_example_2'].mask(df['positive_example_2'] == '', df['positive_example_1'])
+
+  df['negative_example_1'] = df['negative_example_1'].mask(df['negative_example_1'] == '', df['negative_example_2'])
+  df['negative_example_2'] = df['negative_example_2'].mask(df['negative_example_2'] == '', df['negative_example_1'])
+
+  return df
+
+
+def getText(value):
+  return str(value) if pd.notna(value) else ''
+
+
+def extract_texts(row):
+  return {
+    "body": getText(row["body"]),
+    "rule": getText(row["rule"]),
+    "subreddit": getText(row["subreddit"]),
+    "pos1": f"{getText(row['positive_example_1'])}",
+    "pos2": f"{getText(row['positive_example_2'])}",
+    "neg1": f"{getText(row['negative_example_1'])}",
+    "neg2": f"{getText(row['negative_example_2'])}",
+  }
+
+
+df_trn = fill_empty_examples_pandas(df_trn)
+df_tst = fill_empty_examples_pandas(df_tst)
+
+df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
+df_tst["inputs"] = df_tst.apply(extract_texts, axis=1)  # Apply to test data too
+
+N_EPOCHS = 8
+k_folds = 5
+skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
+
+
+# -----------------------------
+# Dataset
+# -----------------------------
+class MultiInputDataset(Dataset):
+  def __init__(self, df, tokenizer, max_len=128, is_test=False):  # Renamed df_trn to df for generality
+    self.df = df
+    self.tokenizer = tokenizer
+    self.max_len = max_len
+    self.is_test = is_test
+
+  def __len__(self):
+    return len(self.df)
+
+  def __getitem__(self, idx):
+    row = self.df.iloc[idx]
+    text_inputs = row["inputs"]
+    item = {}
+    for field in ["body", "rule", "subreddit", "pos1", "pos2", "neg1", "neg2"]:
+      encoded = self.tokenizer(
+        text_inputs[field],
+        truncation=True,
+        padding='max_length',
+        max_length=self.max_len,
+        return_tensors="pt"
+      )
+
+      for key in encoded:
+        item[f"{field}_{key}"] = encoded[key].squeeze(0)
+    if not self.is_test:
+      item["label"] = torch.tensor(row["rule_violation"], dtype=torch.float32)
+    return item
+
+
+# -----------------------------
+# Model
+# -----------------------------
+class MultiInputBERT(nn.Module):
+  def __init__(self):
+    super().__init__()
+    self.bert = AutoModel.from_pretrained(MODEL_PATH)
+    self.dropout = nn.Dropout(0.3)
+    self.classifier = nn.Sequential(
+      nn.Linear(768 * 7, 256),
+      nn.ReLU(),
+      nn.Linear(256, 1)  # Output a single logit
+    )
+
+  def forward(self, inputs):
+    cls_outputs = []
+    for field in ["body", "rule", "subreddit", "pos1", "pos2", "neg1", "neg2"]:
+      out = self.bert(
+        input_ids=inputs[f"{field}_input_ids"],
+        attention_mask=inputs[f"{field}_attention_mask"]
+      )
+      cls_outputs.append(out.last_hidden_state[:, 0])  # CLS token
+    x = torch.cat(cls_outputs, dim=1)
+    x = self.dropout(x)
+    return self.classifier(x)  # Return raw logits
+
+
+# -----------------------------
+# Training and Evaluation
+# -----------------------------
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+
+oof_preds = np.zeros(len(df_trn))
+test_preds_folds = []  # This is correct
+
+for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
+  print(f"\n----- Fold {fold + 1} -----")
+  train_df = df_trn.iloc[train_idx].reset_index(drop=True)
+  val_df = df_trn.iloc[val_idx].reset_index(drop=True)
+
+  train_dataset = MultiInputDataset(train_df, tokenizer)
+  val_dataset = MultiInputDataset(val_df, tokenizer)
+
+  train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+  val_loader = DataLoader(val_dataset, batch_size=8)
+
+  test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=8, shuffle=False)
+
+  model = MultiInputBERT().to(device)
+  optimizer = AdamW(model.parameters(), lr=5e-6)
+  criterion = nn.BCEWithLogitsLoss()
+
+  num_training_steps_per_fold = len(train_loader) * N_EPOCHS
+  num_warmup_steps_per_fold = int(num_training_steps_per_fold * 0.05)
+
+  # Initialize the scheduler
+  scheduler = get_linear_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=num_warmup_steps_per_fold,
+    num_training_steps=num_training_steps_per_fold
+  )
+
+  # Training Loop for this fold
+  best_auc = -1.0  # Track best AUC for this fold
+  best_model_state = None  # To save the best model for this fold
+
+  for epoch in range(N_EPOCHS):
+    model.train()
+    total_loss = 0
+    for batch in tqdm(train_loader, desc=f"Training Epoch {epoch + 1}"):
+      inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
+      labels = batch["label"].to(device)
+
+      optimizer.zero_grad()
+      outputs = model(inputs)
+      logits = outputs.squeeze(-1)
+
+      loss = criterion(logits, labels)
+      loss.backward()
+      optimizer.step()
+      scheduler.step()
+      total_loss += loss.item()
+    print(f"Epoch {epoch + 1} Loss: {total_loss / len(train_loader):.4f}")
+
+    # Eval
+    model.eval()
+    preds_raw, labels_all = [], []
+    with torch.no_grad():
+      for batch in tqdm(val_loader, desc=f"Validating Epoch {epoch + 1}"):
+        inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
+        labels = batch["label"].to(device)
+        outputs = model(inputs)
+        logits = outputs.squeeze(-1)  # Squeeze to [batch_size]
+
+        probs = torch.sigmoid(logits).detach().cpu().tolist()
+        preds_raw.extend(probs)
+        labels_all.extend(labels.cpu().tolist())
+
+      # Hard labels (for classification report, optional)
+      preds = [int(p > 0.5) for p in preds_raw]
+
+      # Print metrics
+      print(classification_report(labels_all, preds, digits=3))
+
+      curr_auc = roc_auc_score(labels_all, preds_raw)
+      print(f"AUC Score: {curr_auc:.4f}")
+
+      # Save the best model for this fold based on validation AUC
+      if curr_auc > best_auc:
+        best_auc = curr_auc
+        best_model_state = model.state_dict()  # Save model weights
+        print(f"  -> New best Val AUC for Fold {fold + 1}: {best_auc:.4f}")
+
+  # 6. Load best model state for this fold
+  model.load_state_dict(best_model_state)  # Use best_model_state
+  print(f"Fold {fold + 1} Best Val AUC: {best_auc:.4f}")
+
+  # Make OOF predictions for this fold's validation set
+  model.eval()
+  fold_val_preds_list = []
+  fold_val_true_list = []
+  with torch.no_grad():
+    for batch in tqdm(val_loader, desc=f"Fold {fold + 1} OOF Prediction"):
+      inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
+      labels = batch["label"].to(device)
+      outputs = model(inputs)
+      logits = outputs.squeeze(-1)  # Squeeze to [batch_size]
+      probs = torch.sigmoid(logits).detach().cpu().tolist()
+      fold_val_preds_list.extend(probs)
+      fold_val_true_list.extend(labels.cpu().tolist())
+
+  oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
+  print(f"Fold {fold + 1} OOF AUC Check: {oof_fold_auc_check:.4f} (Must match Best Val AUC)")
+
+  oof_preds[val_idx] = np.array(fold_val_preds_list)  # Use val_idx from kf.split
+
+  # Make predictions on the TEST set using this fold's best model
+  test_fold_preds = []
+  with torch.no_grad():
+    for batch in tqdm(test_loader, desc=f"Fold {fold + 1} Test Prediction"):
+      inputs = {k: v.to(device) for k, v in batch.items()}
+      outputs = model(inputs)
+      logits = outputs.squeeze(-1)  # Squeeze to [batch_size]
+      probs = torch.sigmoid(logits).detach().cpu().tolist()
+      test_fold_preds.extend(probs)
+
+  test_preds_folds.append(test_fold_preds)  # Store test predictions from this fold
+
+# -----------------------------
+# Final Calculation and Submission
+# -----------------------------
+overall_oof_auc = roc_auc_score(df_trn['rule_violation'], oof_preds)
+print(f"\n--- Overall {k_folds}-Fold OOF AUC: {overall_oof_auc:.4f} ---")
+
+# Average test predictions across all folds
+final_test_predictions = np.mean(test_preds_folds, axis=0)
+
+# Create final submission file
+submission = pd.DataFrame({
+  "row_id": df_tst["row_id"],
+  "rule_violation": final_test_predictions
+})
+submission.to_csv("submission.csv", index=False)  # Save with a distinct name
+print("K-Fold multi-input submission.csv created successfully!")
+print(submission.head(10))
