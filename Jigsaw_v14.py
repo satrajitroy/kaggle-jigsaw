@@ -57,6 +57,68 @@ df_tst = fill_empty_examples_pandas(df_tst)
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
 df_tst["inputs"] = df_tst.apply(extract_texts, axis=1)  # Apply to test data too
 
+text_feature_cols = [
+    'body',
+    'rule',
+    'subreddit',
+    'positive_example_1',
+    'positive_example_2',
+    'negative_example_1',
+    'negative_example_2'
+]
+
+print("--- Comprehensive NaN Inspection for All Text Feature Columns ---")
+
+# 1. Count NaNs for each text feature column
+print("\n--- NaN Counts per Text Feature Column ---")
+print(df_original_trn[text_feature_cols].isnull().sum())
+
+# 2. Analyze rows with NaNs in 'body' (most critical)
+print("\n--- Analysis for 'body' column NaNs ---")
+body_nan_rows = df_original_trn[df_original_trn['body'].isnull()]
+if not body_nan_rows.empty:
+    print(f"Number of rows with NaN in 'body': {len(body_nan_rows)}")
+    print("Rule violation distribution for rows with NaN in 'body':")
+    print(body_nan_rows['rule_violation'].value_counts(normalize=True))
+else:
+    print("No NaN values found in 'body' column.")
+
+# 3. Analyze rows with NaNs in 'rule'
+print("\n--- Analysis for 'rule' column NaNs ---")
+rule_nan_rows = df_original_trn[df_original_trn['rule'].isnull()]
+if not rule_nan_rows.empty:
+    print(f"Number of rows with NaN in 'rule': {len(rule_nan_rows)}")
+    print("Rule violation distribution for rows with NaN in 'rule':")
+    print(rule_nan_rows['rule_violation'].value_counts(normalize=True))
+else:
+    print("No NaN values found in 'rule' column.")
+
+# 4. Analyze rows with NaNs in 'subreddit'
+print("\n--- Analysis for 'subreddit' column NaNs ---")
+subreddit_nan_rows = df_original_trn[df_original_trn['subreddit'].isnull()]
+if not subreddit_nan_rows.empty:
+    print(f"Number of rows with NaN in 'subreddit': {len(subreddit_nan_rows)}")
+    print("Rule violation distribution for rows with NaN in 'subreddit':")
+    print(subreddit_nan_rows['rule_violation'].value_counts(normalize=True))
+else:
+    print("No NaN values found in 'subreddit' column.")
+
+# 5. Analyze rows where ANY of the example columns are NaN
+print("\n--- Analysis for Example Columns NaNs ---")
+example_only_cols = [col for col in text_feature_cols if 'example' in col]
+df_any_example_nan = df_original_trn[df_original_trn[example_only_cols].isnull().any(axis=1)]
+if not df_any_example_nan.empty:
+    print(f"Number of rows with NaN in ANY example column: {len(df_any_example_nan)}")
+    print("Rule violation distribution for rows with NaN in ANY example column:")
+    print(df_any_example_nan['rule_violation'].value_counts(normalize=True))
+else:
+    print("No NaN values found in any example column.")
+
+# 6. Overall rule_violation distribution (for comparison)
+print(f"\n--- Overall rule_violation distribution: ---")
+print(df_original_trn['rule_violation'].value_counts(normalize=True))
+
+
 N_EPOCHS = 8
 k_folds = 5
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
