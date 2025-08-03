@@ -260,7 +260,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
       preds = [int(p > 0.5) for p in preds_raw]
 
       # Print metrics
-      print(classification_report(labels_all, preds, digits=3))
+      print(classification_report(labels_all, preds, digits=3, zero_division=0))
 
       curr_auc = roc_auc_score(labels_all, preds_raw)
       print(f"AUC Score: {curr_auc:.4f}")
