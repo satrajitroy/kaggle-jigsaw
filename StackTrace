@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\Jigsaw.py", line 351, in <module>
+    print(classification_report(labels_all, preds, digits=3, zero_division=0))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\utils\_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\metrics\_classification.py", line 2948, in classification_report
+    y_type, y_true, y_pred = _check_targets(y_true, y_pred)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\metrics\_classification.py", line 97, in _check_targets
+    check_consistent_length(y_true, y_pred)
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\utils\validation.py", line 473, in check_consistent_length
+    raise ValueError(
+ValueError: Found input variables with inconsistent numbers of samples: [24, 21]
