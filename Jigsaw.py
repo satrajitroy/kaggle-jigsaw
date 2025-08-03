@@ -164,7 +164,7 @@ tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 oof_preds = np.zeros(len(df_trn))
 test_preds_folds = [] # This is correct
 
-test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer), batch_size=16, shuffle=False)
+test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer), batch_size=4, shuffle=False)
 
 for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
     print(f"\n----- Fold {fold+1} -----")
@@ -174,8 +174,8 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     train_dataset = MultiInputDataset(train_df, tokenizer)
     val_dataset = MultiInputDataset(val_df, tokenizer)
 
-    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=8)
+    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=4)
 
     test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=16, shuffle=False)
 

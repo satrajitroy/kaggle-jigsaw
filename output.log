@@ -1,609 +1,612 @@
 ----- Fold 1 -----
-2025-08-02 16:21:45.012431: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2025-08-03 03:44:41.995414: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
 WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
-E0000 00:00:1754151705.035207      97 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-E0000 00:00:1754151705.042078      97 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+E0000 00:00:1754192682.206836      76 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1754192682.270843      76 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
 Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-Training Epoch 1: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 1 Loss: 0.6922
-Validating Epoch 1: 100%|██████████| 51/51 [00:09<00:00,  5.11it/s]
+Training Epoch 1: 100%|██████████| 203/203 [04:32<00:00,  1.34s/it]
+Epoch 1 Loss: 0.6935
+Validating Epoch 1: 100%|██████████| 51/51 [00:20<00:00,  2.50it/s]
               precision    recall  f1-score   support
 
-         0.0      0.644     0.615     0.629       200
-         1.0      0.642     0.670     0.656       206
+         0.0      0.614     0.605     0.610       200
+         1.0      0.622     0.631     0.627       206
 
-    accuracy                          0.643       406
-   macro avg      0.643     0.642     0.642       406
-weighted avg      0.643     0.643     0.643       406
+    accuracy                          0.618       406
+   macro avg      0.618     0.618     0.618       406
+weighted avg      0.618     0.618     0.618       406
 
-AUC Score: 0.6831
-  -> New best Val AUC for Fold 1: 0.6831
-Training Epoch 2: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 2 Loss: 0.6722
-Validating Epoch 2: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.6771
+  -> New best Val AUC for Fold 1: 0.6771
+Training Epoch 2: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 2 Loss: 0.6800
+Validating Epoch 2: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.663     0.610     0.635       200
-         1.0      0.649     0.699     0.673       206
+         0.0      0.754     0.460     0.571       200
+         1.0      0.620     0.854     0.718       206
 
-    accuracy                          0.655       406
-   macro avg      0.656     0.655     0.654       406
-weighted avg      0.656     0.655     0.654       406
+    accuracy                          0.660       406
+   macro avg      0.687     0.657     0.645       406
+weighted avg      0.686     0.660     0.646       406
 
-AUC Score: 0.7441
-  -> New best Val AUC for Fold 1: 0.7441
-Training Epoch 3: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 3 Loss: 0.6243
-Validating Epoch 3: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
+AUC Score: 0.7022
+  -> New best Val AUC for Fold 1: 0.7022
+Training Epoch 3: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 3 Loss: 0.6368
+Validating Epoch 3: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.863     0.565     0.683       200
-         1.0      0.684     0.913     0.782       206
+         0.0      0.803     0.510     0.624       200
+         1.0      0.649     0.879     0.746       206
 
-    accuracy                          0.741       406
-   macro avg      0.773     0.739     0.732       406
-weighted avg      0.772     0.741     0.733       406
+    accuracy                          0.697       406
+   macro avg      0.726     0.694     0.685       406
+weighted avg      0.725     0.697     0.686       406
 
-AUC Score: 0.8135
-  -> New best Val AUC for Fold 1: 0.8135
-Training Epoch 4: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 4 Loss: 0.5637
-Validating Epoch 4: 100%|██████████| 51/51 [00:10<00:00,  5.10it/s]
+AUC Score: 0.7961
+  -> New best Val AUC for Fold 1: 0.7961
+Training Epoch 4: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 4 Loss: 0.5605
+Validating Epoch 4: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.837     0.720     0.774       200
-         1.0      0.761     0.864     0.809       206
+         0.0      0.808     0.695     0.747       200
+         1.0      0.739     0.840     0.786       206
 
-    accuracy                          0.793       406
-   macro avg      0.799     0.792     0.792       406
-weighted avg      0.798     0.793     0.792       406
+    accuracy                          0.768       406
+   macro avg      0.774     0.767     0.767       406
+weighted avg      0.773     0.768     0.767       406
 
-AUC Score: 0.8559
-  -> New best Val AUC for Fold 1: 0.8559
-Training Epoch 5: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 5 Loss: 0.4998
-Validating Epoch 5: 100%|██████████| 51/51 [00:10<00:00,  5.10it/s]
+AUC Score: 0.8421
+  -> New best Val AUC for Fold 1: 0.8421
+Training Epoch 5: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 5 Loss: 0.4830
+Validating Epoch 5: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.854     0.670     0.751       200
-         1.0      0.735     0.888     0.804       206
+         0.0      0.870     0.670     0.757       200
+         1.0      0.738     0.903     0.812       206
 
-    accuracy                          0.781       406
-   macro avg      0.794     0.779     0.778       406
-weighted avg      0.793     0.781     0.778       406
+    accuracy                          0.788       406
+   macro avg      0.804     0.786     0.785       406
+weighted avg      0.803     0.788     0.785       406
 
-AUC Score: 0.8443
-Training Epoch 6: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 6 Loss: 0.4551
-Validating Epoch 6: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
+AUC Score: 0.8555
+  -> New best Val AUC for Fold 1: 0.8555
+Training Epoch 6: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 6 Loss: 0.4249
+Validating Epoch 6: 100%|██████████| 51/51 [00:20<00:00,  2.51it/s]
               precision    recall  f1-score   support
 
-         0.0      0.829     0.775     0.801       200
-         1.0      0.795     0.845     0.819       206
+         0.0      0.830     0.755     0.791       200
+         1.0      0.781     0.850     0.814       206
 
-    accuracy                          0.810       406
-   macro avg      0.812     0.810     0.810       406
-weighted avg      0.811     0.810     0.810       406
+    accuracy                          0.803       406
+   macro avg      0.805     0.802     0.802       406
+weighted avg      0.805     0.803     0.802       406
 
-AUC Score: 0.8596
-  -> New best Val AUC for Fold 1: 0.8596
-Training Epoch 7: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 7 Loss: 0.4186
-Validating Epoch 7: 100%|██████████| 51/51 [00:10<00:00,  5.07it/s]
+AUC Score: 0.8664
+  -> New best Val AUC for Fold 1: 0.8664
+Training Epoch 7: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 7 Loss: 0.3901
+Validating Epoch 7: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.853     0.695     0.766       200
-         1.0      0.749     0.883     0.811       206
+         0.0      0.829     0.750     0.787       200
+         1.0      0.778     0.850     0.812       206
 
-    accuracy                          0.791       406
-   macro avg      0.801     0.789     0.788       406
-weighted avg      0.800     0.791     0.789       406
+    accuracy                          0.800       406
+   macro avg      0.803     0.800     0.800       406
+weighted avg      0.803     0.800     0.800       406
 
-AUC Score: 0.8506
-Training Epoch 8: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 8 Loss: 0.3924
-Validating Epoch 8: 100%|██████████| 51/51 [00:10<00:00,  5.07it/s]
+AUC Score: 0.8665
+  -> New best Val AUC for Fold 1: 0.8665
+Training Epoch 8: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 8 Loss: 0.3669
+Validating Epoch 8: 100%|██████████| 51/51 [00:20<00:00,  2.51it/s]
               precision    recall  f1-score   support
 
-         0.0      0.854     0.730     0.787       200
-         1.0      0.770     0.879     0.821       206
+         0.0      0.841     0.765     0.801       200
+         1.0      0.790     0.859     0.823       206
 
-    accuracy                          0.805       406
-   macro avg      0.812     0.804     0.804       406
-weighted avg      0.811     0.805     0.804       406
+    accuracy                          0.813       406
+   macro avg      0.815     0.812     0.812       406
+weighted avg      0.815     0.813     0.812       406
 
-AUC Score: 0.8500
-Fold 1 Best Val AUC: 0.8596
-Fold 1 OOF Prediction: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
-Fold 1 OOF AUC Check: 0.8500 (Must match Best Val AUC)
-Fold 1 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  4.10it/s]
+AUC Score: 0.8693
+  -> New best Val AUC for Fold 1: 0.8693
+Fold 1 Best Val AUC: 0.8693
+Fold 1 OOF Prediction: 100%|██████████| 51/51 [00:20<00:00,  2.51it/s]
+Fold 1 OOF AUC Check: 0.8693 (Must match Best Val AUC)
+Fold 1 Test Prediction: 100%|██████████| 2/2 [00:00<00:00,  3.86it/s]
 Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 
 ----- Fold 2 -----
-Training Epoch 1: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 1 Loss: 0.6938
-Validating Epoch 1: 100%|██████████| 51/51 [00:10<00:00,  5.10it/s]
+Training Epoch 1: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 1 Loss: 0.6970
+Validating Epoch 1: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.599     0.500     0.545       200
-         1.0      0.582     0.675     0.625       206
+         0.0      0.558     0.530     0.544       200
+         1.0      0.565     0.592     0.578       206
 
-    accuracy                          0.589       406
-   macro avg      0.590     0.587     0.585       406
-weighted avg      0.590     0.589     0.585       406
+    accuracy                          0.562       406
+   macro avg      0.561     0.561     0.561       406
+weighted avg      0.561     0.562     0.561       406
 
-AUC Score: 0.6243
-  -> New best Val AUC for Fold 2: 0.6243
-Training Epoch 2: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 2 Loss: 0.6584
-Validating Epoch 2: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.6164
+  -> New best Val AUC for Fold 2: 0.6164
+Training Epoch 2: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 2 Loss: 0.6809
+Validating Epoch 2: 100%|██████████| 51/51 [00:20<00:00,  2.51it/s]
               precision    recall  f1-score   support
 
-         0.0      0.656     0.515     0.577       200
-         1.0      0.610     0.738     0.668       206
+         0.0      0.558     0.530     0.544       200
+         1.0      0.565     0.592     0.578       206
 
-    accuracy                          0.628       406
-   macro avg      0.633     0.626     0.623       406
-weighted avg      0.633     0.628     0.623       406
+    accuracy                          0.562       406
+   macro avg      0.561     0.561     0.561       406
+weighted avg      0.561     0.562     0.561       406
 
-AUC Score: 0.6938
-  -> New best Val AUC for Fold 2: 0.6938
-Training Epoch 3: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 3 Loss: 0.5881
-Validating Epoch 3: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.6462
+  -> New best Val AUC for Fold 2: 0.6462
+Training Epoch 3: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 3 Loss: 0.6561
+Validating Epoch 3: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.862     0.470     0.608       200
-         1.0      0.643     0.927     0.759       206
+         0.0      0.572     0.515     0.542       200
+         1.0      0.571     0.626     0.597       206
 
-    accuracy                          0.702       406
-   macro avg      0.753     0.699     0.684       406
-weighted avg      0.751     0.702     0.685       406
+    accuracy                          0.571       406
+   macro avg      0.572     0.571     0.570       406
+weighted avg      0.571     0.571     0.570       406
 
-AUC Score: 0.8293
-  -> New best Val AUC for Fold 2: 0.8293
-Training Epoch 4: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 4 Loss: 0.5013
-Validating Epoch 4: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.6982
+  -> New best Val AUC for Fold 2: 0.6982
+Training Epoch 4: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 4 Loss: 0.5902
+Validating Epoch 4: 100%|██████████| 51/51 [00:20<00:00,  2.54it/s]
               precision    recall  f1-score   support
 
-         0.0      0.811     0.710     0.757       200
-         1.0      0.749     0.840     0.792       206
+         0.0      0.816     0.600     0.692       200
+         1.0      0.691     0.869     0.770       206
 
-    accuracy                          0.776       406
-   macro avg      0.780     0.775     0.775       406
-weighted avg      0.780     0.776     0.775       406
+    accuracy                          0.736       406
+   macro avg      0.754     0.734     0.731       406
+weighted avg      0.753     0.736     0.731       406
 
-AUC Score: 0.8427
-  -> New best Val AUC for Fold 2: 0.8427
-Training Epoch 5: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 5 Loss: 0.4404
-Validating Epoch 5: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
+AUC Score: 0.8014
+  -> New best Val AUC for Fold 2: 0.8014
+Training Epoch 5: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 5 Loss: 0.5214
+Validating Epoch 5: 100%|██████████| 51/51 [00:20<00:00,  2.54it/s]
               precision    recall  f1-score   support
 
-         0.0      0.846     0.660     0.742       200
-         1.0      0.728     0.883     0.798       206
+         0.0      0.828     0.625     0.712       200
+         1.0      0.706     0.874     0.781       206
 
-    accuracy                          0.773       406
-   macro avg      0.787     0.772     0.770       406
-weighted avg      0.786     0.773     0.770       406
+    accuracy                          0.751       406
+   macro avg      0.767     0.749     0.747       406
+weighted avg      0.766     0.751     0.747       406
 
-AUC Score: 0.8564
-  -> New best Val AUC for Fold 2: 0.8564
-Training Epoch 6: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 6 Loss: 0.3954
-Validating Epoch 6: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
+AUC Score: 0.8258
+  -> New best Val AUC for Fold 2: 0.8258
+Training Epoch 6: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 6 Loss: 0.4599
+Validating Epoch 6: 100%|██████████| 51/51 [00:20<00:00,  2.54it/s]
               precision    recall  f1-score   support
 
-         0.0      0.806     0.770     0.788       200
-         1.0      0.786     0.820     0.803       206
+         0.0      0.784     0.760     0.772       200
+         1.0      0.774     0.796     0.785       206
 
-    accuracy                          0.796       406
-   macro avg      0.796     0.795     0.795       406
-weighted avg      0.796     0.796     0.795       406
+    accuracy                          0.778       406
+   macro avg      0.779     0.778     0.778       406
+weighted avg      0.778     0.778     0.778       406
 
-AUC Score: 0.8521
-Training Epoch 7: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 7 Loss: 0.3579
-Validating Epoch 7: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.8419
+  -> New best Val AUC for Fold 2: 0.8419
+Training Epoch 7: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 7 Loss: 0.4098
+Validating Epoch 7: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.831     0.715     0.769       200
-         1.0      0.756     0.859     0.805       206
+         0.0      0.838     0.700     0.763       200
+         1.0      0.749     0.869     0.804       206
+
+    accuracy                          0.786       406
+   macro avg      0.794     0.784     0.784       406
+weighted avg      0.793     0.786     0.784       406
+
+AUC Score: 0.8475
+  -> New best Val AUC for Fold 2: 0.8475
+Training Epoch 8: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 8 Loss: 0.3899
+Validating Epoch 8: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.835     0.710     0.768       200
+         1.0      0.754     0.864     0.805       206
 
     accuracy                          0.788       406
-   macro avg      0.794     0.787     0.787       406
-weighted avg      0.793     0.788     0.787       406
+   macro avg      0.795     0.787     0.786       406
+weighted avg      0.794     0.788     0.787       406
 
-AUC Score: 0.8577
-  -> New best Val AUC for Fold 2: 0.8577
-Training Epoch 8: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 8 Loss: 0.3321
-Validating Epoch 8: 100%|██████████| 51/51 [00:10<00:00,  5.08it/s]
-              precision    recall  f1-score   support
-
-         0.0      0.836     0.715     0.771       200
-         1.0      0.757     0.864     0.807       206
-
-    accuracy                          0.791       406
-   macro avg      0.797     0.790     0.789       406
-weighted avg      0.796     0.791     0.789       406
-
-AUC Score: 0.8597
-  -> New best Val AUC for Fold 2: 0.8597
-Fold 2 Best Val AUC: 0.8597
-Fold 2 OOF Prediction: 100%|██████████| 51/51 [00:10<00:00,  5.08it/s]
-Fold 2 OOF AUC Check: 0.8597 (Must match Best Val AUC)
-Fold 2 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  4.10it/s]
+AUC Score: 0.8475
+Fold 2 Best Val AUC: 0.8475
+Fold 2 OOF Prediction: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
+Fold 2 OOF AUC Check: 0.8475 (Must match Best Val AUC)
+Fold 2 Test Prediction: 100%|██████████| 2/2 [00:00<00:00,  3.88it/s]
 Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 
 ----- Fold 3 -----
-Training Epoch 1: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 1 Loss: 0.6930
-Validating Epoch 1: 100%|██████████| 51/51 [00:10<00:00,  5.08it/s]
+Training Epoch 1: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 1 Loss: 0.6923
+Validating Epoch 1: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.568     0.525     0.545       200
-         1.0      0.570     0.612     0.590       206
+         0.0      0.525     0.725     0.609       200
+         1.0      0.577     0.364     0.446       206
 
-    accuracy                          0.569       406
-   macro avg      0.569     0.568     0.568       406
-weighted avg      0.569     0.569     0.568       406
+    accuracy                          0.542       406
+   macro avg      0.551     0.545     0.528       406
+weighted avg      0.552     0.542     0.527       406
 
-AUC Score: 0.5902
-  -> New best Val AUC for Fold 3: 0.5902
-Training Epoch 2: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 2 Loss: 0.6710
-Validating Epoch 2: 100%|██████████| 51/51 [00:10<00:00,  5.08it/s]
+AUC Score: 0.6017
+  -> New best Val AUC for Fold 3: 0.6017
+Training Epoch 2: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 2 Loss: 0.6548
+Validating Epoch 2: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.557     0.590     0.573       200
-         1.0      0.577     0.544     0.560       206
+         0.0      0.549     0.675     0.605       200
+         1.0      0.594     0.461     0.519       206
 
     accuracy                          0.567       406
-   macro avg      0.567     0.567     0.566       406
-weighted avg      0.567     0.567     0.566       406
+   macro avg      0.571     0.568     0.562       406
+weighted avg      0.572     0.567     0.562       406
 
-AUC Score: 0.6800
-  -> New best Val AUC for Fold 3: 0.6800
-Training Epoch 3: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 3 Loss: 0.6199
-Validating Epoch 3: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.7019
+  -> New best Val AUC for Fold 3: 0.7019
+Training Epoch 3: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 3 Loss: 0.5999
+Validating Epoch 3: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.817     0.580     0.678       200
-         1.0      0.682     0.874     0.766       206
-
-    accuracy                          0.729       406
-   macro avg      0.749     0.727     0.722       406
-weighted avg      0.748     0.729     0.723       406
-
-AUC Score: 0.8053
-  -> New best Val AUC for Fold 3: 0.8053
-Training Epoch 4: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 4 Loss: 0.5492
-Validating Epoch 4: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
-              precision    recall  f1-score   support
-
-         0.0      0.860     0.615     0.717       200
-         1.0      0.707     0.903     0.793       206
-
-    accuracy                          0.761       406
-   macro avg      0.784     0.759     0.755       406
-weighted avg      0.783     0.761     0.756       406
-
-AUC Score: 0.8556
-  -> New best Val AUC for Fold 3: 0.8556
-Training Epoch 5: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 5 Loss: 0.4661
-Validating Epoch 5: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
-              precision    recall  f1-score   support
-
-         0.0      0.846     0.685     0.757       200
-         1.0      0.742     0.879     0.804       206
-
-    accuracy                          0.783       406
-   macro avg      0.794     0.782     0.781       406
-weighted avg      0.793     0.783     0.781       406
-
-AUC Score: 0.8667
-  -> New best Val AUC for Fold 3: 0.8667
-Training Epoch 6: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 6 Loss: 0.4252
-Validating Epoch 6: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
-              precision    recall  f1-score   support
-
-         0.0      0.864     0.665     0.751       200
-         1.0      0.734     0.898     0.808       206
-
-    accuracy                          0.783       406
-   macro avg      0.799     0.782     0.780       406
-weighted avg      0.798     0.783     0.780       406
-
-AUC Score: 0.8666
-Training Epoch 7: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 7 Loss: 0.3772
-Validating Epoch 7: 100%|██████████| 51/51 [00:10<00:00,  5.10it/s]
-              precision    recall  f1-score   support
-
-         0.0      0.846     0.685     0.757       200
-         1.0      0.742     0.879     0.804       206
-
-    accuracy                          0.783       406
-   macro avg      0.794     0.782     0.781       406
-weighted avg      0.793     0.783     0.781       406
-
-AUC Score: 0.8669
-  -> New best Val AUC for Fold 3: 0.8669
-Training Epoch 8: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 8 Loss: 0.3542
-Validating Epoch 8: 100%|██████████| 51/51 [00:10<00:00,  5.10it/s]
-              precision    recall  f1-score   support
-
-         0.0      0.822     0.695     0.753       200
-         1.0      0.743     0.854     0.795       206
+         0.0      0.839     0.675     0.748       200
+         1.0      0.735     0.874     0.798       206
 
     accuracy                          0.776       406
-   macro avg      0.783     0.775     0.774       406
-weighted avg      0.782     0.776     0.774       406
+   macro avg      0.787     0.774     0.773       406
+weighted avg      0.786     0.776     0.773       406
 
-AUC Score: 0.8675
-  -> New best Val AUC for Fold 3: 0.8675
-Fold 3 Best Val AUC: 0.8675
-Fold 3 OOF Prediction: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
-Fold 3 OOF AUC Check: 0.8675 (Must match Best Val AUC)
-Fold 3 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  4.13it/s]
+AUC Score: 0.8017
+  -> New best Val AUC for Fold 3: 0.8017
+Training Epoch 4: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 4 Loss: 0.5283
+Validating Epoch 4: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.758     0.815     0.786       200
+         1.0      0.806     0.748     0.776       206
+
+    accuracy                          0.781       406
+   macro avg      0.782     0.781     0.781       406
+weighted avg      0.783     0.781     0.781       406
+
+AUC Score: 0.8427
+  -> New best Val AUC for Fold 3: 0.8427
+Training Epoch 5: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 5 Loss: 0.4514
+Validating Epoch 5: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.786     0.810     0.798       200
+         1.0      0.810     0.786     0.798       206
+
+    accuracy                          0.798       406
+   macro avg      0.798     0.798     0.798       406
+weighted avg      0.798     0.798     0.798       406
+
+AUC Score: 0.8561
+  -> New best Val AUC for Fold 3: 0.8561
+Training Epoch 6: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 6 Loss: 0.4129
+Validating Epoch 6: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.819     0.770     0.794       200
+         1.0      0.789     0.835     0.811       206
+
+    accuracy                          0.803       406
+   macro avg      0.804     0.802     0.803       406
+weighted avg      0.804     0.803     0.803       406
+
+AUC Score: 0.8716
+  -> New best Val AUC for Fold 3: 0.8716
+Training Epoch 7: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 7 Loss: 0.3808
+Validating Epoch 7: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.807     0.815     0.811       200
+         1.0      0.819     0.811     0.815       206
+
+    accuracy                          0.813       406
+   macro avg      0.813     0.813     0.813       406
+weighted avg      0.813     0.813     0.813       406
+
+AUC Score: 0.8805
+  -> New best Val AUC for Fold 3: 0.8805
+Training Epoch 8: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 8 Loss: 0.3401
+Validating Epoch 8: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.830     0.755     0.791       200
+         1.0      0.781     0.850     0.814       206
+
+    accuracy                          0.803       406
+   macro avg      0.805     0.802     0.802       406
+weighted avg      0.805     0.803     0.802       406
+
+AUC Score: 0.8781
+Fold 3 Best Val AUC: 0.8805
+Fold 3 OOF Prediction: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
+Fold 3 OOF AUC Check: 0.8781 (Must match Best Val AUC)
+Fold 3 Test Prediction: 100%|██████████| 2/2 [00:00<00:00,  3.91it/s]
 Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 
 ----- Fold 4 -----
-Training Epoch 1: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 1 Loss: 0.6937
-Validating Epoch 1: 100%|██████████| 51/51 [00:10<00:00,  5.07it/s]
+Training Epoch 1: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 1 Loss: 0.6893
+Validating Epoch 1: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      1.000     0.015     0.030       199
-         1.0      0.514     1.000     0.679       207
-
-    accuracy                          0.517       406
-   macro avg      0.757     0.508     0.354       406
-weighted avg      0.752     0.517     0.361       406
-
-AUC Score: 0.6140
-  -> New best Val AUC for Fold 4: 0.6140
-Training Epoch 2: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 2 Loss: 0.6881
-Validating Epoch 2: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
-              precision    recall  f1-score   support
-
-         0.0      0.563     0.583     0.573       199
-         1.0      0.585     0.565     0.575       207
+         0.0      0.547     0.759     0.636       199
+         1.0      0.631     0.396     0.487       207
 
     accuracy                          0.574       406
-   macro avg      0.574     0.574     0.574       406
-weighted avg      0.574     0.574     0.574       406
+   macro avg      0.589     0.577     0.561       406
+weighted avg      0.590     0.574     0.560       406
 
-AUC Score: 0.6747
-  -> New best Val AUC for Fold 4: 0.6747
-Training Epoch 3: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 3 Loss: 0.6457
-Validating Epoch 3: 100%|██████████| 51/51 [00:09<00:00,  5.11it/s]
+AUC Score: 0.6193
+  -> New best Val AUC for Fold 4: 0.6193
+Training Epoch 2: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 2 Loss: 0.6697
+Validating Epoch 2: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.764     0.568     0.651       199
-         1.0      0.667     0.831     0.740       207
+         0.0      0.694     0.503     0.583       199
+         1.0      0.622     0.787     0.695       207
 
-    accuracy                          0.702       406
-   macro avg      0.715     0.699     0.696       406
-weighted avg      0.714     0.702     0.696       406
+    accuracy                          0.648       406
+   macro avg      0.658     0.645     0.639       406
+weighted avg      0.658     0.648     0.640       406
 
-AUC Score: 0.7799
-  -> New best Val AUC for Fold 4: 0.7799
-Training Epoch 4: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 4 Loss: 0.5423
-Validating Epoch 4: 100%|██████████| 51/51 [00:10<00:00,  5.08it/s]
+AUC Score: 0.7044
+  -> New best Val AUC for Fold 4: 0.7044
+Training Epoch 3: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 3 Loss: 0.6346
+Validating Epoch 3: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.755     0.804     0.779       199
-         1.0      0.799     0.749     0.773       207
+         0.0      0.799     0.538     0.643       199
+         1.0      0.662     0.870     0.752       207
 
-    accuracy                          0.776       406
-   macro avg      0.777     0.776     0.776       406
-weighted avg      0.777     0.776     0.776       406
+    accuracy                          0.707       406
+   macro avg      0.730     0.704     0.697       406
+weighted avg      0.729     0.707     0.698       406
 
-AUC Score: 0.8434
-  -> New best Val AUC for Fold 4: 0.8434
-Training Epoch 5: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 5 Loss: 0.4575
-Validating Epoch 5: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.7669
+  -> New best Val AUC for Fold 4: 0.7669
+Training Epoch 4: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 4 Loss: 0.5874
+Validating Epoch 4: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.808     0.739     0.772       199
-         1.0      0.768     0.831     0.798       207
+         0.0      0.774     0.653     0.708       199
+         1.0      0.710     0.816     0.760       207
 
-    accuracy                          0.786       406
-   macro avg      0.788     0.785     0.785       406
-weighted avg      0.787     0.786     0.785       406
+    accuracy                          0.736       406
+   macro avg      0.742     0.735     0.734       406
+weighted avg      0.741     0.736     0.735       406
 
-AUC Score: 0.8628
-  -> New best Val AUC for Fold 4: 0.8628
-Training Epoch 6: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 6 Loss: 0.3917
-Validating Epoch 6: 100%|██████████| 51/51 [00:10<00:00,  5.08it/s]
+AUC Score: 0.8175
+  -> New best Val AUC for Fold 4: 0.8175
+Training Epoch 5: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 5 Loss: 0.5099
+Validating Epoch 5: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.812     0.759     0.784       199
-         1.0      0.782     0.831     0.806       207
+         0.0      0.799     0.739     0.768       199
+         1.0      0.766     0.821     0.793       207
 
-    accuracy                          0.796       406
-   macro avg      0.797     0.795     0.795       406
-weighted avg      0.797     0.796     0.795       406
+    accuracy                          0.781       406
+   macro avg      0.782     0.780     0.780       406
+weighted avg      0.782     0.781     0.780       406
 
-AUC Score: 0.8650
-  -> New best Val AUC for Fold 4: 0.8650
-Training Epoch 7: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 7 Loss: 0.3539
-Validating Epoch 7: 100%|██████████| 51/51 [00:09<00:00,  5.11it/s]
+AUC Score: 0.8446
+  -> New best Val AUC for Fold 4: 0.8446
+Training Epoch 6: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 6 Loss: 0.4617
+Validating Epoch 6: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.809     0.764     0.786       199
-         1.0      0.784     0.826     0.805       207
+         0.0      0.806     0.668     0.731       199
+         1.0      0.726     0.845     0.781       207
 
-    accuracy                          0.796       406
-   macro avg      0.796     0.795     0.795       406
-weighted avg      0.796     0.796     0.795       406
+    accuracy                          0.759       406
+   macro avg      0.766     0.757     0.756       406
+weighted avg      0.765     0.759     0.757       406
 
-AUC Score: 0.8675
-  -> New best Val AUC for Fold 4: 0.8675
-Training Epoch 8: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 8 Loss: 0.3283
-Validating Epoch 8: 100%|██████████| 51/51 [00:09<00:00,  5.10it/s]
+AUC Score: 0.8543
+  -> New best Val AUC for Fold 4: 0.8543
+Training Epoch 7: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 7 Loss: 0.4219
+Validating Epoch 7: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.805     0.749     0.776       199
-         1.0      0.774     0.826     0.799       207
+         0.0      0.795     0.683     0.735       199
+         1.0      0.732     0.831     0.778       207
 
-    accuracy                          0.788       406
-   macro avg      0.790     0.787     0.788       406
-weighted avg      0.789     0.788     0.788       406
+    accuracy                          0.759       406
+   macro avg      0.764     0.757     0.757       406
+weighted avg      0.763     0.759     0.757       406
 
-AUC Score: 0.8660
-Fold 4 Best Val AUC: 0.8675
-Fold 4 OOF Prediction: 100%|██████████| 51/51 [00:10<00:00,  5.10it/s]
-Fold 4 OOF AUC Check: 0.8660 (Must match Best Val AUC)
-Fold 4 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  4.12it/s]
+AUC Score: 0.8508
+Training Epoch 8: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 8 Loss: 0.4148
+Validating Epoch 8: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
+              precision    recall  f1-score   support
+
+         0.0      0.797     0.688     0.739       199
+         1.0      0.735     0.831     0.780       207
+
+    accuracy                          0.761       406
+   macro avg      0.766     0.760     0.759       406
+weighted avg      0.765     0.761     0.760       406
+
+AUC Score: 0.8499
+Fold 4 Best Val AUC: 0.8543
+Fold 4 OOF Prediction: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
+Fold 4 OOF AUC Check: 0.8499 (Must match Best Val AUC)
+Fold 4 Test Prediction: 100%|██████████| 2/2 [00:00<00:00,  3.87it/s]
 Some weights of XLMRobertaModel were not initialized from the model checkpoint at /kaggle/input/xlm-roberta-base-offline/xlm_roberta_base_offline and are newly initialized: ['pooler.dense.bias', 'pooler.dense.weight']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 
 ----- Fold 5 -----
-Training Epoch 1: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 1 Loss: 0.6902
-Validating Epoch 1: 100%|██████████| 51/51 [00:09<00:00,  5.11it/s]
+Training Epoch 1: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 1 Loss: 0.6918
+Validating Epoch 1: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.549     0.593     0.570       199
-         1.0      0.574     0.529     0.551       206
+         0.0      0.582     0.497     0.537       199
+         1.0      0.574     0.655     0.612       206
 
-    accuracy                          0.560       405
-   macro avg      0.561     0.561     0.560       405
-weighted avg      0.561     0.560     0.560       405
+    accuracy                          0.578       405
+   macro avg      0.578     0.576     0.574       405
+weighted avg      0.578     0.578     0.575       405
 
-AUC Score: 0.6079
-  -> New best Val AUC for Fold 5: 0.6079
-Training Epoch 2: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 2 Loss: 0.6411
-Validating Epoch 2: 100%|██████████| 51/51 [00:10<00:00,  5.10it/s]
+AUC Score: 0.6385
+  -> New best Val AUC for Fold 5: 0.6385
+Training Epoch 2: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 2 Loss: 0.6637
+Validating Epoch 2: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.706     0.543     0.614       199
-         1.0      0.639     0.782     0.703       206
+         0.0      0.843     0.377     0.521       199
+         1.0      0.608     0.932     0.736       206
 
-    accuracy                          0.664       405
-   macro avg      0.672     0.662     0.658       405
-weighted avg      0.672     0.664     0.659       405
+    accuracy                          0.659       405
+   macro avg      0.725     0.654     0.628       405
+weighted avg      0.723     0.659     0.630       405
 
-AUC Score: 0.7027
-  -> New best Val AUC for Fold 5: 0.7027
-Training Epoch 3: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 3 Loss: 0.5803
-Validating Epoch 3: 100%|██████████| 51/51 [00:10<00:00,  5.09it/s]
+AUC Score: 0.6777
+  -> New best Val AUC for Fold 5: 0.6777
+Training Epoch 3: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 3 Loss: 0.6237
+Validating Epoch 3: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.812     0.628     0.708       199
-         1.0      0.705     0.859     0.775       206
+         0.0      0.810     0.513     0.628       199
+         1.0      0.652     0.883     0.751       206
 
-    accuracy                          0.746       405
-   macro avg      0.758     0.744     0.741       405
-weighted avg      0.758     0.746     0.742       405
+    accuracy                          0.701       405
+   macro avg      0.731     0.698     0.689       405
+weighted avg      0.730     0.701     0.690       405
 
-AUC Score: 0.7924
-  -> New best Val AUC for Fold 5: 0.7924
-Training Epoch 4: 100%|██████████| 203/203 [02:24<00:00,  1.40it/s]
-Epoch 4 Loss: 0.5027
-Validating Epoch 4: 100%|██████████| 51/51 [00:09<00:00,  5.11it/s]
+AUC Score: 0.7585
+  -> New best Val AUC for Fold 5: 0.7585
+Training Epoch 4: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 4 Loss: 0.5562
+Validating Epoch 4: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.806     0.668     0.731       199
-         1.0      0.725     0.845     0.780       206
+         0.0      0.827     0.648     0.727       199
+         1.0      0.719     0.869     0.787       206
 
-    accuracy                          0.758       405
-   macro avg      0.766     0.757     0.756       405
-weighted avg      0.765     0.758     0.756       405
+    accuracy                          0.760       405
+   macro avg      0.773     0.759     0.757       405
+weighted avg      0.772     0.760     0.757       405
 
-AUC Score: 0.8121
-  -> New best Val AUC for Fold 5: 0.8121
-Training Epoch 5: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 5 Loss: 0.4459
-Validating Epoch 5: 100%|██████████| 51/51 [00:10<00:00,  5.06it/s]
+AUC Score: 0.8085
+  -> New best Val AUC for Fold 5: 0.8085
+Training Epoch 5: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 5 Loss: 0.4749
+Validating Epoch 5: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.842     0.643     0.729       199
-         1.0      0.719     0.883     0.793       206
+         0.0      0.805     0.663     0.727       199
+         1.0      0.722     0.845     0.779       206
 
-    accuracy                          0.765       405
-   macro avg      0.781     0.763     0.761       405
-weighted avg      0.780     0.765     0.762       405
+    accuracy                          0.756       405
+   macro avg      0.763     0.754     0.753       405
+weighted avg      0.763     0.756     0.753       405
 
-AUC Score: 0.8171
-  -> New best Val AUC for Fold 5: 0.8171
-Training Epoch 6: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 6 Loss: 0.3941
-Validating Epoch 6: 100%|██████████| 51/51 [00:10<00:00,  5.06it/s]
+AUC Score: 0.8283
+  -> New best Val AUC for Fold 5: 0.8283
+Training Epoch 6: 100%|██████████| 203/203 [04:36<00:00,  1.36s/it]
+Epoch 6 Loss: 0.4422
+Validating Epoch 6: 100%|██████████| 51/51 [00:20<00:00,  2.52it/s]
               precision    recall  f1-score   support
 
-         0.0      0.807     0.714     0.757       199
-         1.0      0.751     0.835     0.791       206
+         0.0      0.898     0.578     0.703       199
+         1.0      0.697     0.937     0.799       206
 
-    accuracy                          0.775       405
-   macro avg      0.779     0.774     0.774       405
-weighted avg      0.778     0.775     0.774       405
+    accuracy                          0.760       405
+   macro avg      0.798     0.757     0.751       405
+weighted avg      0.796     0.760     0.752       405
 
-AUC Score: 0.8367
-  -> New best Val AUC for Fold 5: 0.8367
-Training Epoch 7: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 7 Loss: 0.3652
-Validating Epoch 7: 100%|██████████| 51/51 [00:10<00:00,  5.05it/s]
+AUC Score: 0.8223
+Training Epoch 7: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 7 Loss: 0.3999
+Validating Epoch 7: 100%|██████████| 51/51 [00:20<00:00,  2.53it/s]
               precision    recall  f1-score   support
 
-         0.0      0.768     0.714     0.740       199
-         1.0      0.741     0.791     0.765       206
+         0.0      0.815     0.688     0.747       199
+         1.0      0.738     0.850     0.790       206
 
-    accuracy                          0.753       405
-   macro avg      0.754     0.752     0.752       405
-weighted avg      0.754     0.753     0.753       405
+    accuracy                          0.770       405
+   macro avg      0.777     0.769     0.768       405
+weighted avg      0.776     0.770     0.769       405
 
-AUC Score: 0.8355
-Training Epoch 8: 100%|██████████| 203/203 [02:25<00:00,  1.40it/s]
-Epoch 8 Loss: 0.3433
-Validating Epoch 8: 100%|██████████| 51/51 [00:10<00:00,  5.05it/s]
+AUC Score: 0.8419
+  -> New best Val AUC for Fold 5: 0.8419
+Training Epoch 8: 100%|██████████| 203/203 [04:35<00:00,  1.36s/it]
+Epoch 8 Loss: 0.3786
+Validating Epoch 8: 100%|██████████| 51/51 [00:20<00:00,  2.54it/s]
               precision    recall  f1-score   support
 
-         0.0      0.786     0.683     0.731       199
-         1.0      0.728     0.820     0.772       206
+         0.0      0.812     0.719     0.763       199
+         1.0      0.755     0.840     0.795       206
 
-    accuracy                          0.753       405
-   macro avg      0.757     0.752     0.751       405
-weighted avg      0.757     0.753     0.752       405
+    accuracy                          0.780       405
+   macro avg      0.784     0.779     0.779       405
+weighted avg      0.783     0.780     0.779       405
 
-AUC Score: 0.8343
-Fold 5 Best Val AUC: 0.8367
-Fold 5 OOF Prediction: 100%|██████████| 51/51 [00:10<00:00,  5.06it/s]
-Fold 5 OOF AUC Check: 0.8343 (Must match Best Val AUC)
-Fold 5 Test Prediction: 100%|██████████| 1/1 [00:00<00:00,  4.06it/s]
+AUC Score: 0.8441
+  -> New best Val AUC for Fold 5: 0.8441
+Fold 5 Best Val AUC: 0.8441
+Fold 5 OOF Prediction: 100%|██████████| 51/51 [00:20<00:00,  2.54it/s]
+Fold 5 OOF AUC Check: 0.8441 (Must match Best Val AUC)
+Fold 5 Test Prediction: 100%|██████████| 2/2 [00:00<00:00,  3.92it/s]
 
---- Overall 5-Fold OOF AUC: 0.8535 ---
+--- Overall 5-Fold OOF AUC: 0.8567 ---
 K-Fold multi-input submission.csv created successfully!
    row_id  rule_violation
-0    2029        0.091403
-1    2030        0.791438
-2    2031        0.888003
-3    2032        0.869777
-4    2033        0.822283
-5    2034        0.062641
-6    2035        0.845681
-7    2036        0.065716
-8    2037        0.063703
-9    2038        0.870676
+0    2029        0.090483
+1    2030        0.771189
+2    2031        0.873278
+3    2032        0.862307
+4    2033        0.763612
+5    2034        0.051552
+6    2035        0.829152
+7    2036        0.073632
+8    2037        0.074869
+9    2038        0.870626
