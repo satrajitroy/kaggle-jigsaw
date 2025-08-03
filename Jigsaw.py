@@ -24,6 +24,7 @@ df_trn = pd.read_csv(trn)
 df_tst = pd.read_csv(tst)
 
 
+
 def get_device():
     # Try to detect NVIDIA CUDA GPU first
     if torch.cuda.is_available():
@@ -175,7 +176,7 @@ class MultiInputDataset(Dataset):
         row = self.df.iloc[idx]
         text_inputs = row["inputs"]
         item = {}
-        for field in ["body", "rule", "subreddit", "pos1", "pos2", "neg1", "neg2"]:
+        for field in ["text_to_classify", "rule", "subreddit"]:
             encoded = self.tokenizer(
                 text_inputs[field],
                 truncation=True,
@@ -199,14 +200,14 @@ class MultiInputBERT(nn.Module):
         self.bert = AutoModel.from_pretrained(model_name)
         self.dropout = nn.Dropout(0.3)
         self.classifier = nn.Sequential(
-            nn.Linear(768 * 7, 256),
+            nn.Linear(768 * 3, 256),
             nn.ReLU(),
             nn.Linear(256, 1) # Output a single logit
         )
 
     def forward(self, inputs):
         cls_outputs = []
-        for field in ["body", "rule", "subreddit", "pos1", "pos2", "neg1", "neg2"]:
+        for field in ["text_to_classify", "rule", "subreddit"]:
             out = self.bert(
                 input_ids=inputs[f"{field}_input_ids"],
                 attention_mask=inputs[f"{field}_attention_mask"]
@@ -231,13 +232,66 @@ test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer), batch_size=4, shu
 for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
     print(f"\n----- Fold {fold+1} -----")
     train_df = df_trn.iloc[train_idx].reset_index(drop=True)
-    val_df = df_trn.iloc[val_idx].reset_index(drop=True)
 
-    train_dataset = MultiInputDataset(train_df, tokenizer)
-    val_dataset = MultiInputDataset(val_df, tokenizer)
+    # Create original train and validation DataFrames for this fold
+    # These are the original body, rules, subreddits, and examples
+    fold_train_df_orig = df_trn.iloc[train_idx_orig].reset_index(drop=True)
+    fold_val_df_orig = df_trn.iloc[val_idx_orig].reset_index(drop=True)
 
-    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=4)
+    # 2. EXPAND the TRAINING data for this fold
+    expanded_train_data = []
+    for idx, row in fold_train_df_orig.iterrows():
+        rule_text = getText(row['rule'])
+        subreddit_text = getText(row['subreddit'])
+        # Add original body as a training sample
+        expanded_train_data.append({
+            'text_to_classify': getText(row['body']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+            'rule_violation': row['rule_violation']
+        })
+        # Add positive examples
+        expanded_train_data.append({
+            'text_to_classify': getText(row['positive_example_1']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+            'rule_violation': 1.0
+        })
+        expanded_train_data.append({
+            'text_to_classify': getText(row['positive_example_2']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+            'rule_violation': 1.0
+        })
+        # Add negative examples
+        expanded_train_data.append({
+            'text_to_classify': getText(row['negative_example_1']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+            'rule_violation': 0.0
+        })
+        expanded_train_data.append({
+            'text_to_classify': getText(row['negative_example_2']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+            'rule_violation': 0.0
+        })
+
+    # Create the expanded training DataFrame for this fold
+    fold_train_df_expanded = pd.DataFrame(expanded_train_data)
+    fold_train_df_expanded = fold_train_df_expanded[fold_train_df_expanded['text_to_classify'] != ''].reset_index(drop=True)
+
+    # 3. Prepare the VALIDATION data for this fold (using original body)
+    # Map 'body' to 'text_to_classify' for the validation set
+    fold_val_df_for_model = fold_val_df_orig.copy()
+    fold_val_df_for_model['text_to_classify'] = fold_val_df_for_model['body']
+
+    # 4. Create Datasets and DataLoaders
+    train_dataset = MultiInputDataset(fold_train_df_expanded, tokenizer) # Train on expanded data
+    val_dataset = MultiInputDataset(fold_val_df_for_model, tokenizer, is_test=True) # Validate on original body
+
+    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=8) # Use a consistent batch size
 
     test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=16, shuffle=False)
 
@@ -323,13 +377,20 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
             logits = outputs.squeeze(-1) # Squeeze to [batch_size]
             probs = torch.sigmoid(logits).detach().cpu().tolist()
             fold_val_preds_list.extend(probs)
-            fold_val_true_list.extend(labels.cpu().tolist())
+           # Get true labels from the original validation DataFrame
+           # This assumes val_loader iterates in the same order as fold_val_df_for_model
+           # which it should if shuffle=False
+           fold_val_true_list.extend(
+             fold_val_df_orig['rule_violation'].iloc[batch.get('idx', 
+             range(len(batch[text_to_classify_input_ids'])))].tolist()
+        ) # More robust way to get labels
 
-    oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
-    print(f"Fold {fold+1} OOF AUC Check: {oof_fold_auc_check:.4f} (Must match Best Val AUC)")
+   # Sanity check: Calculate AUC for this fold's OOF predictions
+   oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
+   print(f"Fold {fold+1} OOF AUC Check: {oof_fold_auc_check:.4f} (This is the true validation AUC for this fold)")
 
-    oof_preds[val_idx] = np.array(fold_val_preds_list) # Use val_idx from kf.split
-
+   # *** CRITICAL FIX: Assign predictions to the correct indices in the global oof_preds array ***
+   oof_preds[val_idx_orig] = np.array(fold_val_preds_list) # Use val_idx_orig from kf.split
     # Make predictions on the TEST set using this fold's best model
     test_fold_preds = []
     with torch.no_grad():
@@ -360,6 +421,7 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
 
 
 
