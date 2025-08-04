@@ -19,7 +19,7 @@ from transformers import AutoTokenizer, AutoModel, get_linear_schedule_with_warm
 trn = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/train.csv"
 tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn)
-df_trn = df_trn.sample(frac=.01, random_state=42).reset_index(drop=True)
+# df_trn = df_trn.sample(frac=.01, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
 
 
@@ -89,6 +89,8 @@ df_trn = fill_empty_examples_pandas(df_trn)
 df_tst = fill_empty_examples_pandas(df_tst)
 
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
+
+df_tst['text_to_classify'] = df_tst['body'].apply(getText)
 df_tst["inputs"] = df_tst.apply(extract_texts, axis=1)
 
 text_feature_cols = [
@@ -288,42 +290,7 @@ for fold, (train_idx_orig, val_idx_orig) in enumerate(skf.split(df_trn, df_trn["
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=8) # Use a consistent batch size
 
-    # Expand the tarining data for this fold
-    expanded_test_data = []
-    for idx, row in df_tst.iterrows():
-        rule_text = getText(row['rule'])
-        subreddit_text = getText(row['subreddit'])
-        # Add original body as a training sample
-        expanded_train_data.append({
-            'text_to_classify': getText(row['body']),
-            'rule': rule_text,
-            'subreddit': subreddit_text,
-        })
-        # Add positive examples
-        expanded_train_data.append({
-            'text_to_classify': getText(row['positive_example_1']),
-            'rule': rule_text,
-            'subreddit': subreddit_text,
-        })
-        expanded_train_data.append({
-            'text_to_classify': getText(row['positive_example_2']),
-            'rule': rule_text,
-            'subreddit': subreddit_text,
-        })
-        # Add negative examples
-        expanded_train_data.append({
-            'text_to_classify': getText(row['negative_example_1']),
-            'rule': rule_text,
-            'subreddit': subreddit_text,
-        })
-        expanded_train_data.append({
-            'text_to_classify': getText(row['negative_example_2']),
-            'rule': rule_text,
-            'subreddit': subreddit_text,
-        })
-
-    fold_test_df_expanded = pd.DataFrame(expanded_test_data)
-    test_loader = DataLoader(MultiInputDataset(fold_test_df_expanded, tokenizer, is_test=True), batch_size=8, shuffle=False)
+    test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=8, shuffle=False)
 
 
     model = MultiInputBERT().to(device)
