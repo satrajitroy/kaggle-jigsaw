@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
-import torch_directml
 from torch.optim import AdamW
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
@@ -20,7 +19,7 @@ from transformers import AutoTokenizer, AutoModel, get_linear_schedule_with_warm
 trn = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/train.csv"
 tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn)
-# df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
+df_trn = df_trn.sample(frac=.01, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
 
 
@@ -154,8 +153,8 @@ print(f"\n--- Overall rule_violation distribution: ---")
 print(df_trn['rule_violation'].value_counts(normalize=True))
 
 
-N_EPOCHS = 8
-k_folds = 5
+N_EPOCHS = 2
+k_folds = 3
 skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
 # -----------------------------
@@ -173,11 +172,10 @@ class MultiInputDataset(Dataset):
 
     def __getitem__(self, idx):
         row = self.df.iloc[idx]
-        text_inputs = row["inputs"]
         item = {}
         for field in ["text_to_classify", "rule", "subreddit"]:
             encoded = self.tokenizer(
-                text_inputs[field],
+                row[field],
                 truncation=True,
                 padding='max_length',
                 max_length=self.max_len,
@@ -226,18 +224,16 @@ tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 oof_preds = np.zeros(len(df_trn))
 test_preds_folds = [] # This is correct
 
-test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer), batch_size=4, shuffle=False)
-
-for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
+for fold, (train_idx_orig, val_idx_orig) in enumerate(skf.split(df_trn, df_trn["rule_violation"])):
     print(f"\n----- Fold {fold+1} -----")
-    train_df = df_trn.iloc[train_idx].reset_index(drop=True)
+    # train_df = df_trn.iloc[train_idx].reset_index(drop=True)
 
     # Create original train and validation DataFrames for this fold
     # These are the original body, rules, subreddits, and examples
     fold_train_df_orig = df_trn.iloc[train_idx_orig].reset_index(drop=True)
     fold_val_df_orig = df_trn.iloc[val_idx_orig].reset_index(drop=True)
 
-    # 2. EXPAND the TRAINING data for this fold
+    # Expand the tarining data for this fold
     expanded_train_data = []
     for idx, row in fold_train_df_orig.iterrows():
         rule_text = getText(row['rule'])
@@ -287,13 +283,47 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
 
     # 4. Create Datasets and DataLoaders
     train_dataset = MultiInputDataset(fold_train_df_expanded, tokenizer) # Train on expanded data
-    val_dataset = MultiInputDataset(fold_val_df_for_model, tokenizer, is_test=True) # Validate on original body
+    val_dataset = MultiInputDataset(fold_val_df_for_model, tokenizer) # Validate on original body
 
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=8) # Use a consistent batch size
 
-    # test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=16, shuffle=False)
-    test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=16, shuffle=False)
+    # Expand the tarining data for this fold
+    expanded_test_data = []
+    for idx, row in df_tst.iterrows():
+        rule_text = getText(row['rule'])
+        subreddit_text = getText(row['subreddit'])
+        # Add original body as a training sample
+        expanded_train_data.append({
+            'text_to_classify': getText(row['body']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+        })
+        # Add positive examples
+        expanded_train_data.append({
+            'text_to_classify': getText(row['positive_example_1']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+        })
+        expanded_train_data.append({
+            'text_to_classify': getText(row['positive_example_2']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+        })
+        # Add negative examples
+        expanded_train_data.append({
+            'text_to_classify': getText(row['negative_example_1']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+        })
+        expanded_train_data.append({
+            'text_to_classify': getText(row['negative_example_2']),
+            'rule': rule_text,
+            'subreddit': subreddit_text,
+        })
+
+    fold_test_df_expanded = pd.DataFrame(expanded_test_data)
+    test_loader = DataLoader(MultiInputDataset(fold_test_df_expanded, tokenizer, is_test=True), batch_size=8, shuffle=False)
 
 
     model = MultiInputBERT().to(device)
@@ -349,17 +379,17 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
             # Hard labels (for classification report, optional)
             preds = [int(p > 0.5) for p in preds_raw]
 
-            # Print metrics
-            print(classification_report(labels_all, preds, digits=3, zero_division=0))
+        # Print metrics
+        print(classification_report(labels_all, preds, digits=3, zero_division=0))
 
-            curr_auc = roc_auc_score(labels_all, preds_raw)
-            print(f"AUC Score: {curr_auc:.4f}")
+        curr_auc = roc_auc_score(labels_all, preds_raw)
+        print(f"AUC Score: {curr_auc:.4f}")
 
-            # Save the best model for this fold based on validation AUC
-            if curr_auc > best_auc:
-                best_auc = curr_auc
-                best_model_state = model.state_dict() # Save model weights
-                print(f"  -> New best Val AUC for Fold {fold+1}: {best_auc:.4f}")
+        # Save the best model for this fold based on validation AUC
+        if curr_auc > best_auc:
+            best_auc = curr_auc
+            best_model_state = model.state_dict() # Save model weights
+            print(f"  -> New best Val AUC for Fold {fold+1}: {best_auc:.4f}")
 
     # 6. Load best model state for this fold
     model.load_state_dict(best_model_state) # Use best_model_state
@@ -370,38 +400,38 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     fold_val_preds_list = []
     fold_val_true_list = []
     with torch.no_grad():
-        for batch in tqdm(val_loader, desc=f"Fold {fold+1} OOF Prediction"):
+        for batch in tqdm(val_loader, desc=f"Fold {fold + 1} OOF Prediction"):
             inputs = {k: v.to(device) for k, v in batch.items() if k != "label"}
             labels = batch["label"].to(device)
             outputs = model(inputs)
-            logits = outputs.squeeze(-1) # Squeeze to [batch_size]
+            logits = outputs.squeeze(-1)  # Squeeze to [batch_size]
             probs = torch.sigmoid(logits).detach().cpu().tolist()
             fold_val_preds_list.extend(probs)
-           # Get true labels from the original validation DataFrame
-           # This assumes val_loader iterates in the same order as fold_val_df_for_model
-           # which it should if shuffle=False
-           fold_val_true_list.extend(
-             fold_val_df_orig['rule_violation'].iloc[batch.get('idx', 
-             range(len(batch[text_to_classify_input_ids'])))].tolist()
-        ) # More robust way to get labels
+            # Get true labels from the original validation DataFrame
+            # This assumes val_loader iterates in the same order as fold_val_df_for_model
+            # which it should if shuffle=False
+            fold_val_true_list.extend(
+                fold_val_df_orig['rule_violation'].iloc[batch.get('idx',
+                range(len(batch['text_to_classify_input_ids'])))].tolist()
+            )  # More robust way to get labels
 
-   # Sanity check: Calculate AUC for this fold's OOF predictions
-   oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
-   print(f"Fold {fold+1} OOF AUC Check: {oof_fold_auc_check:.4f} (This is the true validation AUC for this fold)")
+    # Sanity check: Calculate AUC for this fold's OOF predictions
+    oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
+    print(f"Fold {fold + 1} OOF AUC Check: {oof_fold_auc_check:.4f} (This is the true validation AUC for this fold)")
 
-   # *** CRITICAL FIX: Assign predictions to the correct indices in the global oof_preds array ***
-   oof_preds[val_idx_orig] = np.array(fold_val_preds_list) # Use val_idx_orig from kf.split
+    # Assign predictions to the correct indices in the global oof_preds array
+    oof_preds[val_idx_orig] = np.array(fold_val_preds_list)  # Use val_idx_orig from kf.split
     # Make predictions on the TEST set using this fold's best model
     test_fold_preds = []
     with torch.no_grad():
-        for batch in tqdm(test_loader, desc=f"Fold {fold+1} Test Prediction"):
+        for batch in tqdm(test_loader, desc=f"Fold {fold + 1} Test Prediction"):
             inputs = {k: v.to(device) for k, v in batch.items()}
             outputs = model(inputs)
-            logits = outputs.squeeze(-1) # Squeeze to [batch_size]
+            logits = outputs.squeeze(-1)  # Squeeze to [batch_size]
             probs = torch.sigmoid(logits).detach().cpu().tolist()
             test_fold_preds.extend(probs)
 
-    test_preds_folds.append(test_fold_preds) # Store test predictions from this fold
+    test_preds_folds.append(test_fold_preds)  # Store test predictions from this fold
 
 
 # -----------------------------

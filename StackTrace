@@ -1,15 +1,57 @@
+Fold 3 OOF Prediction:   0%|          | 0/1 [00:00<?, ?it/s]C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\torch\nn\modules\module.py:1562: FutureWarning: `encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `XLMRobertaSdpaSelfAttention.forward`.
+  return forward_call(*args, **kwargs)
+Fold 3 OOF Prediction: 100%|██████████| 1/1 [00:03<00:00,  3.11s/it]
+Fold 3 Test Prediction: 0it [00:00, ?it/s]
 Traceback (most recent call last):
-  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\Jigsaw.py", line 351, in <module>
-    print(classification_report(labels_all, preds, digits=3, zero_division=0))
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\utils\_param_validation.py", line 218, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\metrics\_classification.py", line 2948, in classification_report
-    y_type, y_true, y_pred = _check_targets(y_true, y_pred)
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\metrics\_classification.py", line 97, in _check_targets
-    check_consistent_length(y_true, y_pred)
-  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\sklearn\utils\validation.py", line 473, in check_consistent_length
-    raise ValueError(
-ValueError: Found input variables with inconsistent numbers of samples: [24, 21]
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\Jigsaw.py", line 447, in <module>
+    submission = pd.DataFrame({
+                 ^^^^^^^^^^^^^^
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\pandas\core\frame.py", line 778, in __init__
+    mgr = dict_to_mgr(data, index, columns, dtype=dtype, copy=copy, typ=manager)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\pandas\core\internals\construction.py", line 503, in dict_to_mgr
+    return arrays_to_mgr(arrays, columns, index, dtype=dtype, typ=typ, consolidate=copy)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\pandas\core\internals\construction.py", line 114, in arrays_to_mgr
+    index = _extract_index(arrays)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\satra\PycharmProjects\Kaggle_Contest\.venv\Lib\site-packages\pandas\core\internals\construction.py", line 690, in _extract_index
+    raise ValueError(msg)
+ValueError: array length 0 does not match index length 10
+Fold 3 OOF AUC Check: 0.1111 (This is the true validation AUC for this fold)
+
+--- Overall 3-Fold OOF AUC: 0.4646 ---
+
+
+    # Assign predictions to the correct indices in the global oof_preds array
+    oof_preds[val_idx_orig] = np.array(fold_val_preds_list)  # Use val_idx_orig from kf.split
+    # Make predictions on the TEST set using this fold's best model
+    test_fold_preds = []
+    with torch.no_grad():
+        for batch in tqdm(test_loader, desc=f"Fold {fold + 1} Test Prediction"):
+            inputs = {k: v.to(device) for k, v in batch.items()}
+            outputs = model(inputs)
+            logits = outputs.squeeze(-1)  # Squeeze to [batch_size]
+            probs = torch.sigmoid(logits).detach().cpu().tolist()
+            test_fold_preds.extend(probs)
+
+    test_preds_folds.append(test_fold_preds)  # Store test predictions from this fold
+
+
+# -----------------------------
+# Final Calculation and Submission
+# -----------------------------
+overall_oof_auc = roc_auc_score(df_trn['rule_violation'], oof_preds)
+print(f"\n--- Overall {k_folds}-Fold OOF AUC: {overall_oof_auc:.4f} ---")
+
+# Average test predictions across all folds
+final_test_predictions = np.mean(test_preds_folds, axis=0)
+
+# Create final submission file
+submission = pd.DataFrame({
+    "row_id": df_tst["row_id"],
+    "rule_violation": final_test_predictions
+})
+submission.to_csv("submission.csv", index=False) # Save with a distinct name
+print("K-Fold multi-input submission.csv created successfully!")
+print(submission.head(10))
