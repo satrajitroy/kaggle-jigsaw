@@ -22,8 +22,6 @@ tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn)
 # df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
-# *** ADD THIS LINE: Prepare df_tst for MultiInputDataset ***
-df_tst['text_to_classify'] = df_tst['body'].apply(getText) # Use getText for consistency
 
 
 def get_device():
@@ -92,7 +90,7 @@ df_trn = fill_empty_examples_pandas(df_trn)
 df_tst = fill_empty_examples_pandas(df_tst)
 
 df_trn["inputs"] = df_trn.apply(extract_texts, axis=1)
-df_tst["inputs"] = df_tst.apply(extract_texts, axis=1) # Apply to test data too
+df_tst["inputs"] = df_tst.apply(extract_texts, axis=1)
 
 text_feature_cols = [
     'body',
@@ -294,6 +292,7 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(df_trn, df_trn["rule_viola
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=8) # Use a consistent batch size
 
+    # test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=16, shuffle=False)
     test_loader = DataLoader(MultiInputDataset(df_tst, tokenizer, is_test=True), batch_size=16, shuffle=False)
 
 
@@ -422,6 +421,7 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
 
 
 
