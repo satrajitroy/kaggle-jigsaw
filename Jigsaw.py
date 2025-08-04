@@ -22,7 +22,8 @@ tst = "C:/Users/satra/Downloads/jigsaw-agile-community-rules/test.csv"
 df_trn = pd.read_csv(trn)
 # df_trn = df_trn.sample(frac=.05, random_state=42).reset_index(drop=True)
 df_tst = pd.read_csv(tst)
-
+# *** ADD THIS LINE: Prepare df_tst for MultiInputDataset ***
+df_tst['text_to_classify'] = df_tst['body'].apply(getText) # Use getText for consistency
 
 
 def get_device():
@@ -421,6 +422,7 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
 
 
 
