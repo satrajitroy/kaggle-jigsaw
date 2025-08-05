@@ -374,13 +374,7 @@ for fold, (train_idx_orig, val_idx_orig) in enumerate(skf.split(df_trn, df_trn["
             logits = outputs.squeeze(-1)  # Squeeze to [batch_size]
             probs = torch.sigmoid(logits).detach().cpu().tolist()
             fold_val_preds_list.extend(probs)
-            # Get true labels from the original validation DataFrame
-            # This assumes val_loader iterates in the same order as fold_val_df_for_model
-            # which it should if shuffle=False
-            fold_val_true_list.extend(
-                fold_val_df_orig['rule_violation'].iloc[batch.get('idx',
-                range(len(batch['text_to_classify_input_ids'])))].tolist()
-            )  # More robust way to get labels
+            fold_val_true_list.extend(labels.cpu().tolist())
 
     # Sanity check: Calculate AUC for this fold's OOF predictions
     oof_fold_auc_check = roc_auc_score(fold_val_true_list, fold_val_preds_list)
@@ -418,6 +412,7 @@ submission = pd.DataFrame({
 submission.to_csv("submission.csv", index=False) # Save with a distinct name
 print("K-Fold multi-input submission.csv created successfully!")
 print(submission.head(10))
+
 
 
 
