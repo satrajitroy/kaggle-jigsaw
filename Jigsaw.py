@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+import torch_directml
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from torch.optim import AdamW
@@ -32,23 +33,23 @@ def get_device():
         return device
 
     # If no NVIDIA CUDA GPU, try to detect DirectML GPU
-    # try:
-    #     if torch_directml.is_available():
-    #         device = torch_directml.device()
-    #         print(f"Using DirectML GPU: {device}")
-    #         # Add a small test to ensure it's truly usable
-    #         try:
-    #             _ = torch.tensor([1], device=device)
-    #         except Exception as e:
-    #             print(f"Warning: DirectML device found but not usable ({e}). Falling back to CPU.")
-    #             return torch.device("cpu")
-    #         return device
-    #     else:
-    #         print("DirectML is NOT available.")
-    # except ImportError:
-    #     print("torch_directml not installed.")
-    # except Exception as e:
-    #     print(f"Error checking DirectML: {e}. Falling back to CPU.")
+    try:
+        if torch_directml.is_available():
+            device = torch_directml.device()
+            print(f"Using DirectML GPU: {device}")
+            # Add a small test to ensure it's truly usable
+            try:
+                _ = torch.tensor([1], device=device)
+            except Exception as e:
+                print(f"Warning: DirectML device found but not usable ({e}). Falling back to CPU.")
+                return torch.device("cpu")
+            return device
+        else:
+            print("DirectML is NOT available.")
+    except ImportError:
+        print("torch_directml not installed.")
+    except Exception as e:
+        print(f"Error checking DirectML: {e}. Falling back to CPU.")
 
     # If neither GPU is found, fall back to CPU
     device = torch.device("cpu")
